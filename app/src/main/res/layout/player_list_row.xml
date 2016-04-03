@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:cacheColorHint="@android:color/transparent"
+    android:clickable="false"
+    android:orientation="horizontal"
+    android:paddingBottom="1dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="0dp"
+    android:paddingTop="1dp" >
+
+    <TextView
+        android:id="@+id/cPlayerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:singleLine="true"
+        android:text="PlayerName"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_alignEnd="@+id/cTeamDetails"
+        android:layout_alignRight="@+id/cTeamDetails" />
+
+
+
+    <TextView
+        android:id="@+id/cRole"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:text="PlayerName"
+        android:textSize="12sp"
+        android:layout_below="@+id/cPlayerName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+    <TextView
+        android:id="@+id/cNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Content"
+        android:textSize="24sp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:paddingRight="8sp"
+        android:layout_centerVertical="true"
+        android:paddingLeft="8sp" />
+</RelativeLayout>

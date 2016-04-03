@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">WoW Desktop Background</string>
+    <string name="commentaryEvent">Event</string>
+    <string name="commentaryHeading">Heading</string>
+    <string name="commentaryDescription">Description</string>
+    <string name="commentaryTime">Time</string>
+    <string name="commentaryPrev">Previous</string>
+    <string name="commentaryNext">Next</string>
+    <string name="competitionName"> Competition Name</string>
+    <string name="squadValue">Squad Value</string>
+    <string name="matchReferee">Referee</string>
+    <string name="attendanceText">Attendance text</string>
+    <string name="matchAttendance">Attendance</string>
+    <string name="matchKickOff">Kick-off</string>
+    <string name="matchCompetition">League</string>
+    <string name="matchVenue">Venue</string>
+    <string name="venue">Venue Name</string>
+    <string name="matchDuration">Duration</string>
+    <string name="duration">Match duration</string>
+    <string name="version">1.0</string>
+    <string name="loadMessage">loadmessage</string>
+    <string name="labelTeamName">Team</string>
+    <string name="teamName">Team Name</string>
+    <string name="labelSquadValue">Squad value</string>
+    <string name="labelFormation">Formation</string>
+    <string name="formation">Formation type</string>
+    <string name="seasonsURL">http://api.football-data.org/v1/soccerseasons/</string>
+    <string name="teamURL">http://api.football-data.org/v1/teams/</string>
+    <string name="goalLabel">Goals</string>
+    <string name="winLabel">Points</string>
+    <string name="region_spinner_instructions">Pick WoW region.</string>
+    <string name="server_list_instructions">Pick server.</string>
+    <string name="buttonSearchText">Find</string>
+</resources>

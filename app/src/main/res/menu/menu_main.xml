@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.digitale.wowpaper.MainActivity">
+        <item
+            android:id="@+id/androidSkin"
+            android:enabled="true"
+            android:menuCategory="secondary"
+            android:title="Android"
+            android:visible="true"/>
+        <item
+            android:id="@+id/evertonSkin"
+            android:menuCategory="secondary"
+            android:title="Everton"
+            android:visible="true"/>
+        <item
+            android:id="@+id/bournmouthSkin"
+            android:menuCategory="secondary"
+            android:title="Bournmouth"
+            android:visible="true"/>
+</menu>

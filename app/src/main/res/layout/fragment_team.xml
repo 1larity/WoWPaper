@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="?attr/actionBarSize"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+
+    tools:context="com.digitale.wowpaper.MainActivity$TeamFragment">
+
+    <!-- Event Line -->
+    <TextView
+        android:id="@+id/labelTeam"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/labelTeamName"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/cTeamName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/labelTeam"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/labelTeam"
+        android:text="@string/teamName" />
+    <!-- Event Heading Line -->
+
+    <TextView
+        android:id="@+id/labelSquadValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/labelTeam"
+        android:layout_marginTop="20dp"
+        android:text="@string/labelSquadValue"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/cSquadValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/labelSquadValue"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="30dp"
+        android:layout_toRightOf="@+id/labelSquadValue"
+        android:text="@string/squadValue" />
+
+    <TextView
+        android:id="@+id/labelWins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/winLabel"
+        android:textStyle="bold"
+        android:layout_alignBaseline="@+id/labelSquadValue"
+        android:layout_toRightOf="@+id/cSquadValue"
+        android:layout_toEndOf="@+id/cSquadValue"
+        android:layout_marginLeft="15dp"
+        />
+
+    <TextView
+        android:id="@+id/cWins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/squadValue"
+        android:layout_marginLeft="15dp"
+        android:layout_alignBaseline="@+id/labelSquadValue"
+        android:layout_toRightOf="@+id/labelWins"
+        android:layout_toEndOf="@+id/labelWins" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/labelSquadValue">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1" >
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/chartGoals"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_weight="1" />
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/chartWins"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/labelWins"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <ListView
+            android:layout_weight="1"
+            android:id="@+id/teamListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:overScrollMode="ifContentScrolls"
+            android:paddingTop="20dp" />
+    </LinearLayout>
+
+
+</RelativeLayout>
