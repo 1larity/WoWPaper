@@ -1,10 +1,12 @@
 package com.digitale.wowpaper;
 
+import android.provider.BaseColumns;
+
 /**
  * Created by Rich on 02/04/2016.
  */
-public class WOWCharacter {
-
+public final class WOWCharacter {
+    int _id;
     long lastModified;
     String        name;
     String        realm;
@@ -18,9 +20,44 @@ public class WOWCharacter {
     String        calcClass;
     int        faction;
     int        totalHonorableKills;
-
+    String region;
+    //abstract class for referencing SQLite columns/table
+    public static abstract class CharacterRecord implements BaseColumns {
+        public static final String TABLE_NAME = "wow_character";
+        public static final String COLUMN_NAME_ID = "_id";
+        public static final String COLUMN_NAME_NAME = "name";
+        public static final String COLUMN_NAME_LAST_MODIFIED = "lastModified";
+        public static final String COLUMN_NAME_REALM = "realm";
+        public static final String COLUMN_NAME_BATTLEGROUP = "battlegroup";
+        public static final String COLUMN_NAME_CLASS = "class";
+        public static final String COLUMN_NAME_RACE = "race";
+        public static final String COLUMN_NAME_GENDER = "gender";
+        public static final String COLUMN_NAME_LEVEL = "level";
+        public static final String COLUMN_NAME_ACHIEVEMENT_POINTS = "achievementPoints";
+        public static final String COLUMN_NAME_THUMBNAIL = "thumbnail";
+        public static final String COLUMN_NAME_CALC_CLASS = "calcClass";
+        public static final String COLUMN_NAME_FACTION = "faction";
+        public static final String COLUMN_NAME_TOTAL_HONORABLE_KILLS = "totalHonorableKills";
+        public static final String COLUMN_NAME_REGION = "region";
+        public static final String COLUMN_NAME_NULLABLE = "";
+    }
     public WOWCharacter(){}
+    public String getRegion() {
+        return region;
+    }
 
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+
+    public int get_id() {
+        return _id;
+    }
+
+    public void set_id(int _id) {
+        this._id = _id;
+    }
     public long getLastModified() {
         return lastModified;
     }

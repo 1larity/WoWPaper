@@ -1,25 +1,26 @@
 package com.digitale.wowpaper;
 
-        import android.util.Log;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+import android.widget.Toast;
 
-        import com.google.gson.Gson;
+import com.google.gson.Gson;
 
-        import org.json.JSONArray;
-        import org.json.JSONException;
-        import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
 /**
  * Created by Rich on 15/03/2016.
  * container for season record
  */
 class Database {
-    private static final String TAG ="JSONDATABASE" ;
+    private static final String TAG = "JSONDATABASE";
     private static final boolean DEBUG = false;
     public ArrayList<Realm> realms = new ArrayList<>();
-    public WOWCharacter character=new WOWCharacter();
-
+    public WOWCharacter character = new WOWCharacter();
 
 
     /**
@@ -46,6 +47,7 @@ class Database {
     public void setCharacter(WOWCharacter character) {
         this.character = character;
     }
+
     public void realmFromJSON(String data) {
         JSONArray jRealms;
         try {
@@ -54,21 +56,41 @@ class Database {
             java.lang.reflect.Type type =
                     new com.google.gson.reflect.TypeToken<ArrayList<Realm>>() {
                     }.getType();
-            if(DEBUG){
+            if (DEBUG) {
                 Log.i(TAG, "" + jRealms);
             }
             this.realms = new Gson().fromJson(String.valueOf(jRealms), type);
+            //insert realms into database
+            SQLiteDatabase wdb=MainActivity.db.getWritableDatabase();
+            for(Realm currentRealm:this.realms){
+                Log.d(TAG,"inserting realm "+currentRealm.getName()+" into database");
+                //set the region this server is in to maintain realm>region relationship
+                currentRealm.setRegionID(MainActivity.mWoWRegionID);
+                long ID = MainActivity.db.insertRealm(currentRealm,wdb);
+            }
+            wdb.close();
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-    public void characterFromJson(String data) {
+
+    public long characterFromJson(String data) {
+        long result;
+
         java.lang.reflect.Type type =
                 new com.google.gson.reflect.TypeToken<WOWCharacter>() {
                 }.getType();
-        if(DEBUG){
-            Log.i(TAG, "Character" + data);
-        }
+
         this.character = new Gson().fromJson(data, type);
+        this.character.setRegion(MainActivity.mWoWRegionID);
+        //insert character into database
+        long ID = MainActivity.db.insertCharacter(this.character);
+        result = ID;
+        if (DEBUG) {
+            Log.i(TAG, "Character" + ID + " " + data);
+
+        }
+        return result;
     }
+
 }

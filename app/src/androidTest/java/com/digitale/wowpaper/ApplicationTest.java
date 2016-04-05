@@ -1,4 +1,4 @@
-package com.digitale.leaguereporter;
+package com.digitale.wowpaper;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

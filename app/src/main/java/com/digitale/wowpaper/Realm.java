@@ -1,5 +1,7 @@
 package com.digitale.wowpaper;
 
+import android.provider.BaseColumns;
+
 import java.util.ArrayList;
 
 /**
@@ -17,16 +19,30 @@ public class Realm {
     String locale;
     String timezone;
     String[] connected_realms;
-
+    String regionID;
     /**
      * Blank Constructor
      */
     public Realm() {
-
+//abstract class for referencing SQLite columns/table
     }
-
+    public static abstract class RealmRecord implements BaseColumns {
+        public static final String TABLE_NAME = "realm_status";
+        public static final String COLUMN_NAME_ID = "_id";
+        public static final String COLUMN_NAME_TYPE = "type";
+        public static final String COLUMN_NAME_POPULATION = "population";
+        public static final String COLUMN_NAME_QUEUE = "queue";
+        public static final String COLUMN_NAME_STATUS = "status";
+        public static final String COLUMN_NAME_NAME = "name";
+        public static final String COLUMN_NAME_SLUG = "slug";
+        public static final String COLUMN_NAME_BATTLEGROUP = "battlegroup";
+        public static final String COLUMN_NAME_LOCALE = "locale";
+        public static final String COLUMN_NAME_TIMEZONE = "timezone";
+        public static final String COLUMN_NAME_REGIONID = "region_id";
+        public static final String COLUMN_NAME_NULLABLE = "";
+    }
     public Realm(String type, String population, boolean queue, boolean status, String name, String slug, String battlegroup,
-                 String locale, String timezone, String[] connected_realms) {
+                 String locale, String timezone, String[] connected_realms,String regionID) {
         this.type = type;
         this.population = population;
         this.queue = queue;
@@ -37,10 +53,19 @@ public class Realm {
         this.locale = locale;
         this.timezone = timezone;
         this.connected_realms = connected_realms;
+        this.regionID=regionID;
     }
 
 
     //getters and setters
+    public String getRegionID() {
+        return regionID;
+    }
+
+    public void setRegionID(String regionID) {
+        this.regionID = regionID;
+    }
+
     public String getType() {
         return type;
     }

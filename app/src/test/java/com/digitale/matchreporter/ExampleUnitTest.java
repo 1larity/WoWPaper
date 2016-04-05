@@ -1,4 +1,4 @@
-package com.digitale.leaguereporter;
+package com.digitale.wowpaper;
 
 import org.junit.Test;
 
