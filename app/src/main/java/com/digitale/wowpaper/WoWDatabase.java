@@ -31,7 +31,7 @@ package com.digitale.wowpaper;
             // you must ensure that this folder is available and you have permission
             // to write to it
             //super(context, DATABASE_NAME, context.getExternalFilesDir(null).getAbsolutePath(), null, DATABASE_VERSION);
-            setForcedUpgrade();
+            setForcedUpgrade(2);
 
 
 

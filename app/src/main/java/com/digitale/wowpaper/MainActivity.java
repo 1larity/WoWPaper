@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     public StandingsFragment mStandingsFragment;
     public RealmListFragment realmListFragment;
     public TeamFragment mTeamFragment;
+    public String avatarPostfix = "-avatar.jpg";
+    public String profilePostfix= "-profilemain.jpg";
     /**
      * Data members
      */

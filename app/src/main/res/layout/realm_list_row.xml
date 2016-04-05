@@ -16,8 +16,7 @@
         android:layout_alignParentLeft="true"
         android:singleLine="true"
         android:text="Realm Name"
-        android:textSize="12sp"
-        android:textStyle="bold"
-      />
+        android:textSize="14dip"
+        android:textStyle="bold" />
 
 </RelativeLayout>

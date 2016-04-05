@@ -1,0 +1,8 @@
+Take the "thumbnail" value and replace "avatar.jpg" with "profilemain.jpg". Now, add this prefix:
+ http://render-api-<REGION>.worldofwarcraft.com/static-render/<REGION>/. Your final URL should look
+ something like this random forum user's profile link: http://render-api-us.worldofwarcraft.com/static-render/us/aggramar/177/34640049-profilemain.jpg
+
+If you like, you can even include a default fallback image just like the WoW website does by including
+ an "alt" query parameter. Take the above URL and append: ?alt=/wow/static/images/2d/profilemain/race/<RACE>-<GENDER>.jpg.
+  Using the previous example again, this should look like:
+  http://render-api-us.worldofwarcraft.com/static-render/us/aggramar/177/34640049-profilemain.jpg?alt=/wow/static/images/2d/profilemain/race/11-1.jpg

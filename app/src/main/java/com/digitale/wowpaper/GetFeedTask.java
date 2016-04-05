@@ -52,7 +52,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
 
             case CHARACTER:
                 getURL = activity.mWoWRegionID + "/wow/character/" + MainActivity.mRealmID + "/" +
-                        activity.mCharacterName +
+                       "水晶之刺"+ // activity.mCharacterName +
                         "?locale=en_GB&apikey=" + MainActivity.API;
                 System.out.println("getting character URL " + getURL);
                 break;
@@ -69,6 +69,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                 System.out.println("getting REALM LIST URL " + getURL);
                 break;
         }
+        getURL = new String(getURL.replace(" ", "%20"));
         //nasty deprecated stuff I need for my phone
         //HttpURLConnection is v buggy Eclair/Froyo
         HttpResponse response;
