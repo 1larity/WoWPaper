@@ -66,7 +66,7 @@ public class WoWWallpaperService extends WallpaperService {
     }
 
     private class WoWWallpaperEngine extends WallpaperService.Engine {
-        private final int frameDuration = 20;
+        private final int frameDuration = 100;
 
         private SurfaceHolder holder;
         private Movie movie;
@@ -107,9 +107,11 @@ public class WoWWallpaperService extends WallpaperService {
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
             this.holder = surfaceHolder;
+
         }
         @Override
         public void onVisibilityChanged(boolean visible) {
+            Log.d(TAG,"VISIBLE="+visible);
             this.visible = visible;
             if (visible) {
                 handler.post(drawGIF);
@@ -118,13 +120,15 @@ public class WoWWallpaperService extends WallpaperService {
             }
         }
         private Runnable drawGIF = new Runnable() {
+            Canvas canvas;
             public void run() {
-                draw();
+                draw(canvas);
             }
         };
-        private void draw() {
+        private void draw(Canvas canvas) {
             if (visible) {
-                Canvas canvas = holder.lockCanvas();
+                 canvas = holder.lockCanvas();
+
                 canvas.save();
                 //calculate best fit scale for image while retaining aspect ratio
                 Matrix m = canvas.getMatrix();
@@ -134,11 +138,9 @@ public class WoWWallpaperService extends WallpaperService {
                 m.setRectToRect(drawableRect, viewRect, Matrix.ScaleToFit.CENTER);
                 //scale the canvas
                 canvas.setMatrix(m);
-                int drawWidth=canvas.getWidth()*mNumberOfPages-1;
-                int scrollWidth=canvas.getWidth()/(mNumberOfPages);
            //    Log.d(TAG, "mxoffset " + mXOffset +" h "+canvas.getHeight()+"px"+pictureX+" w "+canvas.getWidth()+"py"+pictureY);
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                movie.draw(canvas,(int)(mXOffset), 0);
+                movie.draw(canvas, (int) (mXOffset), 0);
                 canvas.restore();
                 holder.unlockCanvasAndPost(canvas);
                 movie.setTime((int) (System.currentTimeMillis() % movie.duration()));

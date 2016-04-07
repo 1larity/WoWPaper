@@ -20,7 +20,7 @@ package com.digitale.wowpaper;
     public class WoWDatabase extends SQLiteAssetHelper {
 
         private static final String DATABASE_NAME = "wow.db";
-        private static final int DATABASE_VERSION = 3;
+        private static final int DATABASE_VERSION = 4;
         private static final String TAG = "WOWDATABASE ";
 
         public WoWDatabase(Context context) {
@@ -31,7 +31,7 @@ package com.digitale.wowpaper;
             // you must ensure that this folder is available and you have permission
             // to write to it
             //super(context, DATABASE_NAME, context.getExternalFilesDir(null).getAbsolutePath(), null, DATABASE_VERSION);
-            setForcedUpgrade(2);
+            setForcedUpgrade(4);
 
 
 
@@ -41,14 +41,11 @@ package com.digitale.wowpaper;
         public Cursor getRegions() {
             SQLiteDatabase db = getReadableDatabase();
             SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
             String [] sqlSelect = {"0 _id", "geo_zone_name", "url"};
             String sqlTables = "api_connection_details";
-
             qb.setTables(sqlTables);
             Cursor c = qb.query(db, sqlSelect, null, null,
                     null, null, null);
-
             c.moveToFirst();
             return c;
 
@@ -89,6 +86,39 @@ package com.digitale.wowpaper;
             c.moveToFirst();
             return c.getString(0);
         }
+        //get API image URL for a given region ID number
+        public String getCurrentImageRegionURL(int regionID) {
+            SQLiteDatabase db = getReadableDatabase();
+            SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+            //get URl COLUMN
+            String [] sqlSelect = { "url"};
+            //from list of API endpoints
+            String sqlTables = "api_render_connection_details";
+            qb.setTables(sqlTables);
+            //where record id=requested id
+            Cursor c = qb.query(db, sqlSelect, "_id='"+regionID+"'", null,
+                    null, null, null);
+            c.moveToFirst();
+            return c.getString(0);
+        }
+        //get a character image URL using realm.bg,name,region key
+        public String getCharacterImageURL(String charName,String realm,String battlegroup,int regionID) {
+            SQLiteDatabase db = getReadableDatabase();
+            SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+            //get character thumbnail URLs  column
+            String [] sqlSelect = { "thumbnail"};
+            //from list of characters
+            String sqlTables = "wow_character";
+            qb.setTables(sqlTables);
+            //where character has matching realm.bg,name,region key
+            Cursor c = qb.query(db, sqlSelect, WOWCharacter.CharacterRecord.COLUMN_NAME_NAME+"='"+charName+"' AND "+
+                            WOWCharacter.CharacterRecord.COLUMN_NAME_REALM+"='"+realm+"' AND "+
+                            WOWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"='"+battlegroup+"' AND "+
+                            WOWCharacter.CharacterRecord.COLUMN_NAME_REGION+"='"+regionID+"'", null,
+                    null, null, null);
+            c.moveToFirst();
+            return c.getString(0);
+        }
         //adds character record to database
         public long insertCharacter(WOWCharacter character) {
             SQLiteDatabase wdb=getWritableDatabase();
@@ -119,8 +149,11 @@ package com.digitale.wowpaper;
                     Log.d(TAG,"Character Exists, Updating");
                     //conflict exists, update row where character realm,name,battlegroup and region match
                     wdb.update( WOWCharacter.CharacterRecord.TABLE_NAME, characterValues,
-                            "realm=? AND battlegroup=? AND name=? AND region=?",
-                            new String[] {character.getRealm(),character.getBattlegroup(),character.getName(),character.getRegion()});  // number 1 is the _id here, update to variable for your code
+                            WOWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
+                                    WOWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
+                                    WOWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
+                                    WOWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?",
+                            new String[] {character.getRealm(),character.getBattlegroup(),character.getName(),String.valueOf(character.getRegion())});
                 }
             } catch (SQLiteConstraintException e) {
                      newRowId = -1;
@@ -129,7 +162,8 @@ package com.digitale.wowpaper;
             return newRowId;
         }
         //adds realm record to database
-        public long insertRealm(Realm realm, SQLiteDatabase wdb) {
+        public long insertRealm(Realm realm) {
+            SQLiteDatabase wdb=getWritableDatabase();
             ContentValues realmValues = new ContentValues();
             realmValues.put(Realm.RealmRecord.COLUMN_NAME_TYPE, realm.getType());
             realmValues.put(Realm.RealmRecord.COLUMN_NAME_POPULATION, realm.getPopulation());
@@ -161,7 +195,31 @@ package com.digitale.wowpaper;
             } catch (SQLiteConstraintException e) {
                            newRowId = -1;
             }
+            wdb.close();
+            return newRowId;
+        }
+        //adds character record to database
+        public long updateCharacterAvatar(WOWCharacter character, byte[] avatar) {
+            SQLiteDatabase wdb=getWritableDatabase();
+            ContentValues characterValues = new ContentValues();
+            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_AVATAR, avatar);
 
+            // Insert the new row, returning the primary key value of the new row
+            long newRowId = 0;
+            try  {
+                    Log.d(TAG,"Character Exists, Updating Avatar");
+                    //conflict exists, update row where character realm,name,battlegroup and region match
+                    wdb.update( WOWCharacter.CharacterRecord.TABLE_NAME, characterValues,
+                            WOWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
+                                    WOWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
+                                    WOWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
+                                    WOWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?",
+                            new String[] {character.getRealm(),character.getBattlegroup(),character.getName(),String.valueOf(character.getRegion())});
+
+            } catch (SQLiteConstraintException e) {
+                newRowId = -1;
+            }
+            wdb.close();
             return newRowId;
         }
     }

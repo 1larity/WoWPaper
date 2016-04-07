@@ -7,6 +7,9 @@ package com.digitale.wowpaper;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -18,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import android.widget.Spinner;
@@ -89,7 +93,7 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
                         //set global region ID
                         mWoWRegionID = db.getCurrentRegionURL(position);
                         //refresh server list
-                        GetFeedTask realmsAsyncTask = new GetFeedTask((MainActivity) getActivity());
+                        GetFeedTask realmsAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.REALMLISTREFRESH);
                         realmsAsyncTask.execute(GetFeedTask.REALMLISTREFRESH);
                         if (DEBUG)
                             Log.i(TAG, " POSITION" + position + " Region URL " + mWoWRegionID);
@@ -106,8 +110,8 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
 
                 UI.hideKeyboardFrom(getContext(), v);
                 mCharacterName=String.valueOf(searchEditText.getText());
-                GetFeedTask statsAsyncTask = new GetFeedTask((MainActivity) getActivity());
-                statsAsyncTask.execute(GetFeedTask.CHARACTER);
+                GetFeedTask charaterDataAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.CHARACTER);
+                charaterDataAsyncTask.execute(GetFeedTask.CHARACTER);
             }
 
         });
@@ -123,6 +127,14 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
         if (rootView != null) {
             TextView serverText = (TextView) rootView.findViewById(R.id.labelSelectedServer);
             serverText.setText(mRealmID);
+
+        }
+    }
+    public void setAvatarDisplay(){
+        if (rootView != null) {
+            ImageView avatarImage = (ImageView) rootView.findViewById(R.id.imageAvatar);
+            Bitmap bmp = BitmapFactory.decodeByteArray(mDatabase.character.getAvatar(), 0, mDatabase.character.getAvatar().length);
+            avatarImage.setImageBitmap(bmp);
 
         }
     }

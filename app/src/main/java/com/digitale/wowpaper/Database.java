@@ -66,7 +66,7 @@ class Database {
                 Log.d(TAG,"inserting realm "+currentRealm.getName()+" into database");
                 //set the region this server is in to maintain realm>region relationship
                 currentRealm.setRegionID(MainActivity.mWoWRegionID);
-                long ID = MainActivity.db.insertRealm(currentRealm,wdb);
+                long ID = MainActivity.db.insertRealm(currentRealm);
             }
             wdb.close();
         } catch (JSONException e) {
@@ -82,7 +82,8 @@ class Database {
                 }.getType();
 
         this.character = new Gson().fromJson(data, type);
-        this.character.setRegion(MainActivity.mWoWRegionID);
+        //set the reion of this character to maintain character>region relationship
+        this.character.setRegion(MainActivity.db.getRegionIDFromURL(MainActivity.mWoWRegionID));
         //insert character into database
         long ID = MainActivity.db.insertCharacter(this.character);
         result = ID;
@@ -93,4 +94,13 @@ class Database {
         return result;
     }
 
+    /**
+     * sets the current charater avatar image and store in SQLite
+     * @param characterAvatar
+     */
+    public void setAvatar(byte[] characterAvatar) {
+        this.character.setAvatar(characterAvatar);
+        //update character avatar image
+        long ID = MainActivity.db.updateCharacterAvatar(this.character,characterAvatar);
+    }
 }

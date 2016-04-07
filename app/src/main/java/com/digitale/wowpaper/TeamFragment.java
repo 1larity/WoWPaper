@@ -11,12 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -83,37 +78,7 @@ public class TeamFragment extends Fragment implements FragmentNotifier {
         }
 
     }
-    public void setChart(int goals,int goalsAgainst,int goalDiff,PieChart chart,String title){
-        ArrayList <Entry> dataSet=new ArrayList<Entry>();
-        //set data
-        Entry c1=new Entry(goals,0);
-        Entry c2=new Entry(goalsAgainst,1);
-        Entry c3=new Entry(goalDiff,2);
-        dataSet.add(c1);
-        dataSet.add(c2);
-        dataSet.add(c3);
-        PieDataSet goalData=new PieDataSet(dataSet,"");
-        ArrayList<String> xVals = new ArrayList<String>();
-       if(title.equals("Goals")) {
-           xVals.add("For");
-           xVals.add("Against");
-           xVals.add("Difference");
-       }else{
-           xVals.add("Wins");
-           xVals.add("Losses");
-           xVals.add("Draws");
-       }
-        //set appearence
-        chart.setDrawSliceText(false);
-        chart.setDescription("");
-        chart.setCenterText(title);
-        goalData.setValueTextSize(15f);
-        goalData.setColors(new int[]{R.color.green, R.color.red, R.color.yellow}, (MainActivity) getActivity());
-        DecimalFormat format=new DecimalFormat("##");
-        goalData.setValueFormatter(new IntegerFormatter());
-        PieData pieData=new PieData(xVals,goalData);
-        chart.animateXY(1000, 1000);
-        chart.setData(pieData);
-        chart.invalidate();
+    public void setChart(int goals,int goalsAgainst,int goalDiff,String title){
+
     }
 }

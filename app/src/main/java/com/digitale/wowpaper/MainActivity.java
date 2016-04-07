@@ -18,13 +18,18 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import java.util.ArrayList;
 
-
+/**
+ *
+ */
 public class MainActivity extends AppCompatActivity {
     /**
      * Debug members
      */
     public static final boolean DEBUG = true;
     private static final String TAG ="WOWDB" ;
+    /**
+     * API key required to query blizzard server
+     */
     public static final String API ="5hpb65p224yrhe8bgrsf34hhna2bq6xr" ;
     /**
      * UI members
@@ -46,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     public static Database mDatabase=new Database();
     ArrayList <Realm> mRealmList =new ArrayList<>();
     static String mRealmID;
-    public int mSeasonYear=2015;
     //data source team id
     static int mTeamID=66;
     //internal database id
@@ -135,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
      * get data and refresh UI
      */
     private void refreshData() {
-        GetFeedTask realmlistAsyncTask = new GetFeedTask(this);
+        GetFeedTask realmlistAsyncTask = new GetFeedTask(this,GetFeedTask.REALMLIST);
        realmlistAsyncTask.execute(GetFeedTask.REALMLIST);
         }
     @Override

@@ -8,20 +8,23 @@ import android.provider.BaseColumns;
 public final class WOWCharacter {
     int _id;
     long lastModified;
-    String        name;
-    String        realm;
-    String        battlegroup;
-    int        wowClass;
-    int        race;
-    int        gender;
-    int        level;
-    int        achievementPoints;
-    String        thumbnail;
-    String        calcClass;
-    int        faction;
-    int        totalHonorableKills;
-    String region;
+    String name;
+    String realm;
+    String battlegroup;
+    int wowClass;
+    int race;
+    int gender;
+    int level;
+    int achievementPoints;
+    String thumbnail;
+    String calcClass;
+    int faction;
+    int totalHonorableKills;
+    int region_id;
+    byte[] avatar;
+    byte[] profilemain;
     //abstract class for referencing SQLite columns/table
+    //makes it easy to change underlying tables
     public static abstract class CharacterRecord implements BaseColumns {
         public static final String TABLE_NAME = "wow_character";
         public static final String COLUMN_NAME_ID = "_id";
@@ -38,19 +41,35 @@ public final class WOWCharacter {
         public static final String COLUMN_NAME_CALC_CLASS = "calcClass";
         public static final String COLUMN_NAME_FACTION = "faction";
         public static final String COLUMN_NAME_TOTAL_HONORABLE_KILLS = "totalHonorableKills";
-        public static final String COLUMN_NAME_REGION = "region";
+        public static final String COLUMN_NAME_REGION = "region_id";
+        public static final String COLUMN_NAME_AVATAR = "avatar";
+        public static final String COLUMN_NAME_PROFILE = "profilemain";
         public static final String COLUMN_NAME_NULLABLE = "";
     }
     public WOWCharacter(){}
-    public String getRegion() {
-        return region;
+    public int getRegion() {
+        return region_id;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setRegion(int region) {
+        this.region_id = region;
     }
 
+    public byte[] getAvatar() {
+        return avatar;
+    }
 
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
+
+    public byte[] getProfilemain() {
+        return profilemain;
+    }
+
+    public void setProfilemain(byte[] profilemain) {
+        this.profilemain = profilemain;
+    }
     public int get_id() {
         return _id;
     }

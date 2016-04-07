@@ -42,7 +42,7 @@ public class StandingsFragment extends Fragment implements FragmentNotifier{
                 MainActivity.mTeamID =Integer.valueOf(str);
                 MainActivity.mTeamIndex=position;
                System.out.println("POSITION" + position + " TEAM ID " + MainActivity.mTeamID);
-                GetFeedTask teamAsyncTask = new GetFeedTask((MainActivity) getActivity());
+             //   GetFeedTask teamAsyncTask = new GetFeedTask((MainActivity) getActivity());
              //   teamAsyncTask.execute(GetFeedTask.TEAM);
              //   GetFeedTask playersAsyncTask = new GetFeedTask((MainActivity) getActivity());
              //   playersAsyncTask.execute(GetFeedTask.PLAYERS);
