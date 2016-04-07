@@ -2,8 +2,8 @@ package com.digitale.wowpaper;
 
 
 import android.app.ProgressDialog;
+import android.database.Cursor;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -27,11 +27,14 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
     //enumerate task modes
     private static final int NODATA = -2;
     private static final int NETWORKFAIL = -1;
+    public static final int REALMLIST = 1;
     public static final int CHARACTER = 2;
     public static final int REALMLISTREFRESH = 3;
     public static final int CHARACTERIMAGE = 4;
-    public static final int PLAYER = 5;
-    public static final int REALMLIST = 1;
+    public static final int CHARACTERLIST = 5;
+    public static final int CHARACTERPROFILE = 6;
+    public String avatarPostfix = "-avatar.jpg";
+    public String profilePostfix= "-profilemain.jpg";
     public MainActivity activity;
     private int mode;
     private ProgressDialog progressDialog;
@@ -50,13 +53,23 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                 break;
             case CHARACTERIMAGE:
                 progressDialog = ProgressDialog.show(activity,
-                        "Please wait", "Downloading image for "+activity.mCharacterName);
+                        "Please wait", "Downloading avatar for "+activity.mCharacterName);
                 break;
             case REALMLIST:
                 progressDialog = ProgressDialog.show(activity,
                         "Please wait", "Downloading realms for "+
                                 activity.db.getRegionNameFromURL(activity.mWoWRegionID)+
                 " region.");
+                break;
+            case REALMLISTREFRESH:
+                progressDialog = ProgressDialog.show(activity,
+                        "Please wait", "Downloading realms for "+
+                                activity.db.getRegionNameFromURL(activity.mWoWRegionID)+
+                                " region.");
+                break;
+            case CHARACTERPROFILE:
+                progressDialog = ProgressDialog.show(activity,
+                        "Please wait", "Downloading image for "+activity.mCharacterName);
                 break;
         }
     }
@@ -71,6 +84,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
     protected TaskResult doInBackground(Integer... params) {
         TaskResult results = new TaskResult();
          mode = params[0];
+        WoWCharacter currentCharacter= MainActivity.mDatabase.getCharacter();
         String getURL = "";
         //formulate urls depending on mode
         switch (mode) {
@@ -82,12 +96,20 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                 System.out.println("getting character URL " + getURL);
                 break;
             case CHARACTERIMAGE:
-                WOWCharacter currentCharacter = MainActivity.mDatabase.getCharacter();
                 getURL = MainActivity.db.getCurrentImageRegionURL(
                         MainActivity.db.getRegionIDFromURL(MainActivity.mWoWRegionID))
                         + MainActivity.db.getCharacterImageURL(currentCharacter.getName(), currentCharacter.getRealm(),
                         currentCharacter.getBattlegroup(), currentCharacter.getRegion());
-                System.out.println("getting character image URL " + getURL);
+                System.out.println("getting character avatar URL " + getURL);
+                break;
+            case CHARACTERPROFILE:
+                //use string replacement to alter ...avatar.jpg to ...profilemain.jpg in image URL
+                String profileURL=MainActivity.db.getCharacterImageURL(currentCharacter.getName(), currentCharacter.getRealm(),
+                        currentCharacter.getBattlegroup(), currentCharacter.getRegion()).replaceAll("avatar.jpg","profilemain.jpg");
+                getURL = MainActivity.db.getCurrentImageRegionURL(
+                        MainActivity.db.getRegionIDFromURL(MainActivity.mWoWRegionID))
+                        + profileURL;
+                System.out.println("getting character profile image URL " + getURL);
                 break;
             case REALMLIST:
                 getURL = MainActivity.mWoWRegionID + "wow/realm/status?locale=en_GB&apikey=" + MainActivity.API;
@@ -96,6 +118,21 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             case REALMLISTREFRESH:
                 getURL = MainActivity.mWoWRegionID + "wow/realm/status?locale=en_GB&apikey=" + MainActivity.API;
                 System.out.println("getting REALM LIST URL " + getURL);
+                break;
+            case CHARACTERLIST:
+                activity.mCharacters.clear();
+                Cursor charactersCursor=activity.db.getCharacters();
+                charactersCursor.moveToFirst();
+                while( !charactersCursor.isAfterLast()) {
+                    WoWCharacter cursorCharacter=new WoWCharacter();
+                    cursorCharacter.setName(charactersCursor.getString(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_NAME)));
+                    cursorCharacter.setRealm(charactersCursor.getString(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_REALM)));
+                    cursorCharacter.setAvatar(charactersCursor.getBlob(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_AVATAR)));
+                        // The Cursor is now set to the right position
+                    activity.mCharacters.add( cursorCharacter);
+                    charactersCursor.moveToNext();
+                }
+
                 break;
         }
         //format URL to remove spaces
@@ -109,10 +146,10 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
         String str = null;
         byte[] image = new byte[0];
         try {
-            if (!isCancelled()) {
+            if (!isCancelled() && mode != CHARACTERLIST) {
                 response = myClient.execute(get);
                 //if we are getting a character image
-                if (mode == CHARACTERIMAGE) {
+                if (mode == CHARACTERIMAGE || mode == CHARACTERPROFILE) {
                     //retrieve a bitmap
                     ImageDownloader imageDownloader = new ImageDownloader();
                     image = imageDownloader.getLogoImage(getURL);
@@ -124,15 +161,15 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
 
             // pass data to database for saving to internal data structures
             if ((image.length>=0 ||str != null) && !(isCancelled())) {
-                if (mode == CHARACTER)
+                if (mode == CHARACTER){
                     decodeCharacter(str);
-                else if (mode == PLAYER) {
-//                    System.out.println("PLAYER DATA");
-                    //    activity.mDatabase.PlayerFromJson;
+
                 } else if (mode == REALMLIST || mode == REALMLISTREFRESH) {
                     decodeRealms(str);
                 } else if (mode == CHARACTERIMAGE) {
                     decodeCharacterImage(image);
+                } else if (mode == CHARACTERIMAGE) {
+                    decodeProfileImage(image);
                 }
                 results.setMode(mode);
             }
@@ -165,7 +202,20 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
         activity.mDatabase.setAvatar(image);
 //        }
     }
+    //check server supplied valid image then store
+    private void decodeProfileImage(byte[] image) throws DataNotFoundException {
 
+
+        //check for error response in data
+//        if (str.contains("nok") && str.contains("status")) {
+//            //data contains server error code, tell user and stop
+//            throw new DataNotFoundException("Data error:- Cannot retrieve realm list for region "
+//                    + activity.db.getRegionNameFromURL(activity.mWoWRegionID));
+//        } else {
+        //response is ok, decode and store character JSON
+        activity.mDatabase.setProfileImage(image);
+//        }
+    }
     //check server supplied valid data then store
     private void decodeRealms(String str) throws JSONException, DataNotFoundException {
         System.out.println("Realm DATA" + str);
@@ -201,27 +251,21 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
 
 
     public void onPostExecute(TaskResult result) {
-        progressDialog.dismiss();
-
         System.out.println("REFRESHUI mode "+result.getMode());
-
+        if(progressDialog!=null) progressDialog.dismiss();
         if (result.getMode() == CHARACTER) {
             System.out.println("DB CHARACTER CONTENTS" + activity.mDatabase.getCharacter().getName());
             //now we have character record, get it's images.
+            //get avatar image
             GetFeedTask characterImageAsyncTask = new GetFeedTask(activity,GetFeedTask.CHARACTERIMAGE);
             characterImageAsyncTask.execute(GetFeedTask.CHARACTERIMAGE);
-
+            //get profilemain image
+            GetFeedTask characterProfileAsyncTask = new GetFeedTask(activity,GetFeedTask.CHARACTERIMAGE);
+            characterProfileAsyncTask.execute(GetFeedTask.CHARACTERPROFILE);
+            //refresh character list data
+            GetFeedTask characterListAsyncTask = new GetFeedTask(activity,GetFeedTask.CHARACTERLIST);
+            characterListAsyncTask.execute(GetFeedTask.CHARACTERLIST);
             System.out.println("GOT CHARACTER DATA");
-            try {
-                activity.mTeamFragment.invalidateTeamView(activity);
-            } catch (NullPointerException e) {
-                //fragment simply doesn't exist yet, not a problem
-            }
-
-            //   activity.mPlayerList.clear();
-            //  activity.mPlayerList.addAll(activity.mDatabase.getTeam().getPlayers());
-            MainActivity.mPlayerAdapter.notifyDataSetChanged();
-
         } else if (result.getMode() == NETWORKFAIL) {
             //Oh Google! Enforced statics in abstract classes make baby jesus cry!
             Toast.makeText(activity.getContext(), "Cannot contact server, please try again later",
@@ -251,6 +295,8 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             //valid image was retrieved, update UI
             activity.realmListFragment.setAvatarDisplay();
             System.out.println("GOT CHARACTER IMAGE");
+        }else if(result.getMode()==CHARACTERLIST){
+            activity.mCharactersAdapter.notifyDataSetChanged();
         }
 
     }

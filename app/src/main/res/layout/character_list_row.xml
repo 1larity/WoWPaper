@@ -11,38 +11,34 @@
     android:paddingTop="1dp" >
 
     <TextView
-        android:id="@+id/cPlayerName"
+        android:id="@+id/cCharacterName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:singleLine="true"
-        android:text="PlayerName"
+        android:text="Character Name"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:layout_alignEnd="@+id/cTeamDetails"
-        android:layout_alignRight="@+id/cTeamDetails" />
-
-
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 
     <TextView
-        android:id="@+id/cRole"
+        android:id="@+id/cCharacterDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:text="PlayerName"
-        android:textSize="12sp"
-        android:layout_below="@+id/cPlayerName"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-    <TextView
-        android:id="@+id/cNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Content"
-        android:textSize="24sp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:paddingRight="8sp"
+        android:layout_below="@+id/cCharacterName"
+        android:text="Character details."
+        android:textSize="12sp" />
+
+    <ImageView
+        android:layout_width="40dip"
+        android:layout_height="40dip"
+        android:id="@+id/imageListAvatar"
+        android:layout_weight=".1"
+        android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
-        android:paddingLeft="8sp" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

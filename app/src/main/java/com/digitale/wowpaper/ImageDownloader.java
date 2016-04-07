@@ -15,6 +15,8 @@ import java.net.URLConnection;
  * Created by Rich on 07/04/2016.
  */
 public class ImageDownloader  {
+    private static final String TAG ="IMAGEDOWNLOADER" ;
+
     public byte[] getLogoImage(String url) {
         byte[] photo = new byte[0];
         try {
@@ -29,9 +31,9 @@ public class ImageDownloader  {
 
             }
             photo = baf.toByteArray();
-            System.out.println("photo length" + photo);
+            Log.d(TAG,"photo length" + photo);
         } catch (Exception e) {
-            Log.d("ImageManager", "Error: " + e.toString());
+            Log.e(TAG, "Error: " + e.toString());
         }
         return photo;
     }

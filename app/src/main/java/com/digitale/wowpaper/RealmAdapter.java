@@ -22,9 +22,6 @@ public class RealmAdapter extends BaseAdapter {
 
         public RealmAdapter(Context context, ArrayList<Realm> data) {
             this.mData = data;
-//            for (Season currentSeason : this.mData) {
-//                System.out.println("ADAPTOR Realms " + currentSeason.getCaption());
-//            }
             inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }

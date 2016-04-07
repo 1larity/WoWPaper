@@ -110,8 +110,9 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
 
                 UI.hideKeyboardFrom(getContext(), v);
                 mCharacterName=String.valueOf(searchEditText.getText());
-                GetFeedTask charaterDataAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.CHARACTER);
-                charaterDataAsyncTask.execute(GetFeedTask.CHARACTER);
+                GetFeedTask characterDataAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.CHARACTER);
+                characterDataAsyncTask.execute(GetFeedTask.CHARACTER);
+
             }
 
         });

@@ -5,7 +5,7 @@ import android.provider.BaseColumns;
 /**
  * Created by Rich on 02/04/2016.
  */
-public final class WOWCharacter {
+public final class WoWCharacter {
     int _id;
     long lastModified;
     String name;
@@ -46,7 +46,7 @@ public final class WOWCharacter {
         public static final String COLUMN_NAME_PROFILE = "profilemain";
         public static final String COLUMN_NAME_NULLABLE = "";
     }
-    public WOWCharacter(){}
+    public WoWCharacter(){}
     public int getRegion() {
         return region_id;
     }

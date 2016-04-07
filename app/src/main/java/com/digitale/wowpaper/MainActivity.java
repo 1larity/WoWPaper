@@ -40,34 +40,29 @@ public class MainActivity extends AppCompatActivity {
     public static String mCharacterName;
     public ViewPager mViewPager;
     public static MainActivity mActivity;
-    public StandingsFragment mStandingsFragment;
+    public CharactersFragment mCharactersFragment;
     public RealmListFragment realmListFragment;
-    public TeamFragment mTeamFragment;
-    public String avatarPostfix = "-avatar.jpg";
-    public String profilePostfix= "-profilemain.jpg";
+
     /**
      * Data members
      */
     public static Database mDatabase=new Database();
     ArrayList <Realm> mRealmList =new ArrayList<>();
     static String mRealmID;
+    public static WoWDatabase db;
     //data source team id
     static int mTeamID=66;
     //internal database id
     public static int mTeamIndex;
-    ArrayList <Standing>mStandings=new ArrayList<>();
-    public  ArrayList<CommentaryListItem> mCommentaryList = new ArrayList<>();
-    public  ArrayList<Player> mPlayerList = new ArrayList<>();
-    /**
+    ArrayList <WoWCharacter> mCharacters =new ArrayList<>();
+     /**
      * Logic members
      */
     private Handler mRefreshHandler = new Handler();
     public static RealmAdapter mRealmAdapter;
-    public static StandingsAdapter mStandingsAdapter;
-    public static PlayerAdapter mPlayerAdapter;
+    public static CharactersAdapter mCharactersAdapter;
 
 
-    public static WoWDatabase db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
         //load player portraits
         mRealmAdapter = new RealmAdapter(this, mRealmList);
-        mStandingsAdapter = new StandingsAdapter(this,mStandings);
-        mPlayerAdapter =new PlayerAdapter(this, mPlayerList);
+        mCharactersAdapter = new CharactersAdapter(this, mCharacters);
+
         mActivity = this;
         ui.onActivityCreateSetTheme(this);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -141,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
     private void refreshData() {
         GetFeedTask realmlistAsyncTask = new GetFeedTask(this,GetFeedTask.REALMLIST);
        realmlistAsyncTask.execute(GetFeedTask.REALMLIST);
+        GetFeedTask characterListAsyncTask = new GetFeedTask(this,GetFeedTask.CHARACTERLIST);
+        characterListAsyncTask.execute(GetFeedTask.CHARACTERLIST);
         }
     @Override
     public void onDestroy() {
@@ -200,17 +197,14 @@ public class MainActivity extends AppCompatActivity {
                     fragment= new RealmListFragment();
                     break;
                 case 1:
-                    fragment= new StandingsFragment();
+                    fragment= new CharactersFragment();
                     break;
-                case 2:
-                    fragment= new TeamFragment();
-                    break;
-            }
+               }
             return fragment;
         }
         @Override
         public int getCount() {
-            return 3;
+            return 2;
         }
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
@@ -221,12 +215,9 @@ public class MainActivity extends AppCompatActivity {
                     realmListFragment = (RealmListFragment) createdFragment;
                     break;
                 case 1:
-                    mStandingsFragment = (StandingsFragment) createdFragment;
+                    mCharactersFragment = (CharactersFragment) createdFragment;
                     break;
-                case 2:
-                    mTeamFragment = (TeamFragment) createdFragment;
-                    break;
-            }
+                  }
             return createdFragment;
         }
 
@@ -234,12 +225,10 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Leagues";
+                    return "Character\nSearch";
                 case 1:
-                    return "League Teams";
-                case 2:
-                    return "Team";
-            }
+                    return "Character\nGallery";
+                     }
             return null;
         }
     }
