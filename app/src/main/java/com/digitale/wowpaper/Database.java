@@ -1,8 +1,6 @@
 package com.digitale.wowpaper;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -20,7 +18,7 @@ class Database {
     private static final String TAG = "JSONDATABASE";
     private static final boolean DEBUG = false;
     public ArrayList<Realm> realms = new ArrayList<>();
-    public WOWCharacter character = new WOWCharacter();
+    public WoWCharacter character = new WoWCharacter();
 
 
     /**
@@ -40,11 +38,11 @@ class Database {
     }
 
 
-    public WOWCharacter getCharacter() {
+    public WoWCharacter getCharacter() {
         return character;
     }
 
-    public void setCharacter(WOWCharacter character) {
+    public void setCharacter(WoWCharacter character) {
         this.character = character;
     }
 
@@ -61,28 +59,29 @@ class Database {
             }
             this.realms = new Gson().fromJson(String.valueOf(jRealms), type);
             //insert realms into database
-            SQLiteDatabase wdb=MainActivity.db.getWritableDatabase();
-            for(Realm currentRealm:this.realms){
-                Log.d(TAG,"inserting realm "+currentRealm.getName()+" into database");
-                //set the region this server is in to maintain realm>region relationship
-                currentRealm.setRegionID(MainActivity.mWoWRegionID);
-                long ID = MainActivity.db.insertRealm(currentRealm);
-            }
-            wdb.close();
+            Log.d(TAG,"inserting realms into database");
+            //set the region this server is in to maintain realm>region relationship
+            long ID = MainActivity.db.insertRealms(this.realms);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Convert data string to objects of WoWCharacter type with GSON library
+     *
+     * @param data String of JSON objects representing WoW character traits.
+     * @return result Long ID of the inserted row.
+     */
     public long characterFromJson(String data) {
         long result;
 
         java.lang.reflect.Type type =
-                new com.google.gson.reflect.TypeToken<WOWCharacter>() {
+                new com.google.gson.reflect.TypeToken<WoWCharacter>() {
                 }.getType();
 
         this.character = new Gson().fromJson(data, type);
-        //set the reion of this character to maintain character>region relationship
+        //set the region of this character to maintain character>region relationship
         this.character.setRegion(MainActivity.db.getRegionIDFromURL(MainActivity.mWoWRegionID));
         //insert character into database
         long ID = MainActivity.db.insertCharacter(this.character);
@@ -95,12 +94,23 @@ class Database {
     }
 
     /**
-     * sets the current charater avatar image and store in SQLite
+     * sets the current character avatar image and store in SQLite db
      * @param characterAvatar
      */
     public void setAvatar(byte[] characterAvatar) {
+        Log.d(TAG,"Commiting avatar data (size)"+characterAvatar.length);
         this.character.setAvatar(characterAvatar);
         //update character avatar image
-        long ID = MainActivity.db.updateCharacterAvatar(this.character,characterAvatar);
+        long ID = MainActivity.db.updateCharacterAvatar(this.character, characterAvatar);
+    }
+    /**
+     * sets the current character profile image and store in SQLite db
+     * @param characterProfile
+     */
+    public void setProfileImage(byte[] characterProfile) {
+        Log.d(TAG,"Commiting profile data (size)"+characterProfile.length);
+        this.character.setProfilemain(characterProfile);
+        //update character avatar image
+        long ID = MainActivity.db.updateCharacterProfilemain(this.character, characterProfile);
     }
 }

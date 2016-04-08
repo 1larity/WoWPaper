@@ -54,6 +54,7 @@ public class CharactersAdapter extends BaseAdapter {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             RelativeLayout itemView;
+
             if (convertView == null) {
                 itemView = (RelativeLayout) inflater.inflate(R.layout.character_list_row,  parent,false);
             }else {

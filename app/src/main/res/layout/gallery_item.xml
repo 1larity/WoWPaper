@@ -1,10 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="horizontal" android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="0dip"
+    android:showDividers="none">
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:id="@+id/imageProfile" />
+        android:id="@+id/imageProfile"
+        android:layout_margin="0dip"
+        android:padding="0dip"
+        android:layout_weight="7"
+        android:src="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:measureWithLargestChild="true"
+        android:padding="0dip"
+        android:layout_gravity="left">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:layout_weight="1"
+            android:src="@mipmap/ic_everton"
+            android:layout_gravity="left" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView2"
+            android:src="@mipmap/ic_bournemouth"
+            android:layout_weight="1"
+            android:layout_gravity="left" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView3"
+            android:src="@mipmap/ic_launcher"
+            android:layout_weight="1"
+            android:layout_gravity="left" />
+    </LinearLayout>
+
 </LinearLayout>

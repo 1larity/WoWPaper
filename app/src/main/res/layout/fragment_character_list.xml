@@ -9,25 +9,44 @@
     tools:context="com.digitale.wowpaper.MainActivity$LeagueFragment">
 
     <!-- Scrolling gallery of character profile images -->
-    <HorizontalScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/profileScrollView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
 
     <!-- List of characters searched for and added to database -->
 
-    <ListView
-        android:id="@+id/leagueListView"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:overScrollMode="ifContentScrolls"
-        android:paddingTop="20dp"
-        android:layout_below="@+id/profileScrollView"
-        android:layout_centerHorizontal="true"
-        android:paddingBottom="?attr/actionBarSize" />
+        android:layout_height="match_parent">
+
+        <org.lucasr.twowayview.widget.TwoWayView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/galleryView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TwoWayView"
+                           app:twowayview_layoutManager="GridLayoutManager"
+            app:horizontalSpacing="16dp"
+            android:layout_margin="3dp"
+            app:twowayview_numRows="1"
+            app:twowayview_numColumns="5"
+            android:clickable="true"
+            android:padding="-10dip"
+            android:paddingEnd="0dip"
+            android:paddingStart="0dip"
+            android:layout_weight="1.5" />
+
+        <ListView
+            android:id="@+id/leagueListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:clickable="true"
+            android:overScrollMode="ifContentScrolls"
+            android:paddingTop="20dp"
+            android:layout_below="@+id/galleryView"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="?attr/actionBarSize"
+            android:layout_weight="3" />
+
+    </LinearLayout>
 
 </RelativeLayout>

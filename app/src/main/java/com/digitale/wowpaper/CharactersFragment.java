@@ -14,12 +14,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.lucasr.twowayview.TwoWayLayoutManager;
+import org.lucasr.twowayview.widget.TwoWayView;
 
 /**
  * Characters list/picker Fragment.
@@ -38,12 +41,11 @@ public class CharactersFragment extends Fragment implements FragmentNotifier{
         final Cursor wowCharacters;
         rootView = inflater.inflate(R.layout.fragment_character_list, container, false);
         //set up gallery of profile images
-        HorizontalScrollView profileGallery=(HorizontalScrollView)rootView.findViewById(R.id.profileScrollView);
-        View llgalleryItemLayout= inflater.inflate(R.layout.gallery_item,profileGallery,false);
-        ImageView imageProfile= (ImageView)llgalleryItemLayout.findViewById(R.id.imageProfile);
-       // Bitmap bmp = BitmapFactory.decodeByteArray(MainActivity.mDatabase.getCharacter().getProfilemain(), 0, MainActivity.mDatabase.getCharacter().getProfilemain().length);
-        //imageProfile.setImageBitmap(bmp);
-        profileGallery.addView(llgalleryItemLayout);
+        TwoWayView profileGallery=(TwoWayView) rootView.findViewById(R.id.galleryView);
+        profileGallery.setOrientation(TwoWayLayoutManager.Orientation.HORIZONTAL);
+        profileGallery.setAdapter(MainActivity.mGalleryAdapter);
+
+
         //set up listview of characters in SQLite database
         ListView characterListView = (ListView) rootView.findViewById(R.id.leagueListView);
          characterListView.setAdapter(MainActivity.mCharactersAdapter);

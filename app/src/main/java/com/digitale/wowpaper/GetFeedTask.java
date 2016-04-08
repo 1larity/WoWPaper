@@ -120,6 +120,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                 System.out.println("getting REALM LIST URL " + getURL);
                 break;
             case CHARACTERLIST:
+                //update mainactivity data cache/adaptor datasource with characterlist data
                 activity.mCharacters.clear();
                 Cursor charactersCursor=activity.db.getCharacters();
                 charactersCursor.moveToFirst();
@@ -128,6 +129,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                     cursorCharacter.setName(charactersCursor.getString(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_NAME)));
                     cursorCharacter.setRealm(charactersCursor.getString(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_REALM)));
                     cursorCharacter.setAvatar(charactersCursor.getBlob(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_AVATAR)));
+                    cursorCharacter.setProfilemain(charactersCursor.getBlob(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_PROFILE)));
                         // The Cursor is now set to the right position
                     activity.mCharacters.add( cursorCharacter);
                     charactersCursor.moveToNext();
@@ -168,7 +170,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                     decodeRealms(str);
                 } else if (mode == CHARACTERIMAGE) {
                     decodeCharacterImage(image);
-                } else if (mode == CHARACTERIMAGE) {
+                } else if (mode == CHARACTERPROFILE) {
                     decodeProfileImage(image);
                 }
                 results.setMode(mode);
@@ -297,6 +299,9 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             System.out.println("GOT CHARACTER IMAGE");
         }else if(result.getMode()==CHARACTERLIST){
             activity.mCharactersAdapter.notifyDataSetChanged();
+            activity.mGalleryAdapter.notifyDataSetChanged();
+        }else if(result.getMode()==CHARACTERPROFILE){
+            System.out.println("GOT CHARACTER PROFILE IMAGE");
         }
 
     }

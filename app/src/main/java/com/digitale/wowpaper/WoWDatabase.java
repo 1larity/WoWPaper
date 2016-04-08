@@ -17,7 +17,9 @@ package com.digitale.wowpaper;
 
     import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-    public class WoWDatabase extends SQLiteAssetHelper {
+    import java.util.ArrayList;
+
+public class WoWDatabase extends SQLiteAssetHelper {
 
         private static final String DATABASE_NAME = "wow.db";
         private static final int DATABASE_VERSION = 4;
@@ -50,6 +52,18 @@ package com.digitale.wowpaper;
             return c;
 
         }
+    //get list of all characters
+    public Cursor getCharacters() {
+        SQLiteDatabase db = getReadableDatabase();
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        String sqlTables = "wow_character";
+        qb.setTables(sqlTables);
+        Cursor c = qb.query(db, null, null, null,
+                null, null, null);
+        c.moveToFirst();
+        return c;
+
+    }
         //get API URL for a given region ID number
         public String getCurrentRegionURL(int position) {
             SQLiteDatabase db = getReadableDatabase();
@@ -111,48 +125,48 @@ package com.digitale.wowpaper;
             String sqlTables = "wow_character";
             qb.setTables(sqlTables);
             //where character has matching realm.bg,name,region key
-            Cursor c = qb.query(db, sqlSelect, WOWCharacter.CharacterRecord.COLUMN_NAME_NAME+"='"+charName+"' AND "+
-                            WOWCharacter.CharacterRecord.COLUMN_NAME_REALM+"='"+realm+"' AND "+
-                            WOWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"='"+battlegroup+"' AND "+
-                            WOWCharacter.CharacterRecord.COLUMN_NAME_REGION+"='"+regionID+"'", null,
+            Cursor c = qb.query(db, sqlSelect, WoWCharacter.CharacterRecord.COLUMN_NAME_NAME+"='"+charName+"' AND "+
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_REALM+"='"+realm+"' AND "+
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"='"+battlegroup+"' AND "+
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_REGION+"='"+regionID+"'", null,
                     null, null, null);
             c.moveToFirst();
             return c.getString(0);
         }
         //adds character record to database
-        public long insertCharacter(WOWCharacter character) {
+        public long insertCharacter(WoWCharacter character) {
             SQLiteDatabase wdb=getWritableDatabase();
             ContentValues characterValues = new ContentValues();
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_NAME, character.getName());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_LAST_MODIFIED, character.getLastModified());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_REALM, character.getRealm());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP, character.getBattlegroup());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_CLASS, character.getWowClass());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_RACE, character.getRace());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_GENDER, character.getGender());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_LEVEL, character.getLevel());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_ACHIEVEMENT_POINTS, character.getAchievementPoints());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_THUMBNAIL, character.getThumbnail());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_CALC_CLASS, character.getCalcClass());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_FACTION, character.getFaction());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_TOTAL_HONORABLE_KILLS, character.getTotalHonorableKills());
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_REGION, character.getRegion());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_NAME, character.getName());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_LAST_MODIFIED, character.getLastModified());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_REALM, character.getRealm());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP, character.getBattlegroup());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_CLASS, character.getWowClass());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_RACE, character.getRace());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_GENDER, character.getGender());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_LEVEL, character.getLevel());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_ACHIEVEMENT_POINTS, character.getAchievementPoints());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_THUMBNAIL, character.getThumbnail());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_CALC_CLASS, character.getCalcClass());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_FACTION, character.getFaction());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_TOTAL_HONORABLE_KILLS, character.getTotalHonorableKills());
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_REGION, character.getRegion());
             // Insert the new row, returning the primary key value of the new row
             long newRowId = 0;
             try {
                 //insert character into table or update pre-existing
                 newRowId = wdb.insertWithOnConflict(
-                        WOWCharacter.CharacterRecord.TABLE_NAME,
-                        WOWCharacter.CharacterRecord.COLUMN_NAME_NULLABLE,
+                        WoWCharacter.CharacterRecord.TABLE_NAME,
+                        WoWCharacter.CharacterRecord.COLUMN_NAME_NULLABLE,
                         characterValues, SQLiteDatabase.CONFLICT_IGNORE);
                 if (newRowId == -1) {
                     Log.d(TAG,"Character Exists, Updating");
                     //conflict exists, update row where character realm,name,battlegroup and region match
-                    wdb.update( WOWCharacter.CharacterRecord.TABLE_NAME, characterValues,
-                            WOWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
-                                    WOWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
-                                    WOWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
-                                    WOWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?",
+                    wdb.update( WoWCharacter.CharacterRecord.TABLE_NAME, characterValues,
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
+                                    WoWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
+                                    WoWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
+                                    WoWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?",
                             new String[] {character.getRealm(),character.getBattlegroup(),character.getName(),String.valueOf(character.getRegion())});
                 }
             } catch (SQLiteConstraintException e) {
@@ -162,65 +176,109 @@ package com.digitale.wowpaper;
             return newRowId;
         }
         //adds realm record to database
-        public long insertRealm(Realm realm) {
+        public long insertRealms(ArrayList<Realm> realms) {
             SQLiteDatabase wdb=getWritableDatabase();
-            ContentValues realmValues = new ContentValues();
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_TYPE, realm.getType());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_POPULATION, realm.getPopulation());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_QUEUE, realm.isQueue());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_STATUS, realm.isStatus());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_NAME, realm.getName());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_SLUG, realm.getSlug());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_BATTLEGROUP, realm.getBattlegroup());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_LOCALE, realm.getLocale());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_TIMEZONE, realm.getTimezone());
-            realmValues.put(Realm.RealmRecord.COLUMN_NAME_REGIONID, realm.getRegionID());
-            // Insert the new row, returning the primary key value of the new row
-            long newRowId = 0;
-            try {
-                //insert realm into table or update pre-existing
-                newRowId = wdb.insertWithOnConflict(
-                        Realm.RealmRecord.TABLE_NAME,
-                        Realm.RealmRecord.COLUMN_NAME_NULLABLE,
-                        realmValues, SQLiteDatabase.CONFLICT_IGNORE);
-                //insert returns -1 if row alreday exists
-                if (newRowId == -1) {
-                    Log.d(TAG,"Realm Exists, Updating");
-                    //conflict exists, update row where realm name and realm region match
-                    newRowId =   wdb.update( Realm.RealmRecord.TABLE_NAME, realmValues,
-                            "name=? AND region_id=?",
-                            new String[] {realm.getName(),realm.getRegionID()});
-                }
+            long result=0;
+            int insertedCount=0;
+            int updatedCount=0;
+            for(Realm realm:realms) {
+                ContentValues realmValues = new ContentValues();
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_TYPE, realm.getType());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_POPULATION, realm.getPopulation());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_QUEUE, realm.isQueue());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_STATUS, realm.isStatus());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_NAME, realm.getName());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_SLUG, realm.getSlug());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_BATTLEGROUP, realm.getBattlegroup());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_LOCALE, realm.getLocale());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_TIMEZONE, realm.getTimezone());
+                realmValues.put(Realm.RealmRecord.COLUMN_NAME_REGIONID, realm.getRegionID());
+                // Insert the new row, returning the primary key value of the new row
+                long newRowId = 0;
+                try {
+                    //insert realm into table or update pre-existing
+                    newRowId = wdb.insertWithOnConflict(
+                            Realm.RealmRecord.TABLE_NAME,
+                            Realm.RealmRecord.COLUMN_NAME_NULLABLE,
+                            realmValues, SQLiteDatabase.CONFLICT_IGNORE);
+                    //insert returns -1 if row alreday exists
+                    if (newRowId == -1) {
+                        Log.d(TAG, "Realm "+realmValues.get(Realm.RealmRecord.COLUMN_NAME_NAME)+" exists, updating");
+                        //conflict exists, update row where realm name and realm region match
+                        newRowId = wdb.update(Realm.RealmRecord.TABLE_NAME, realmValues,
+                                "name=? AND region_id=?",
+                                new String[]{realm.getName(), realm.getRegionID()});
+                        updatedCount=updatedCount+1;
+                    }else{
+                        Log.d(TAG, "Realm "+realmValues.get(Realm.RealmRecord.COLUMN_NAME_NAME)+
+                                " does not exist, inserted at row"+newRowId);
+                        insertedCount=insertedCount+1;
+                    }
 
-            } catch (SQLiteConstraintException e) {
-                           newRowId = -1;
+                } catch (SQLiteConstraintException e) {
+                    newRowId = -1;
+                }
+                result=newRowId;
             }
             wdb.close();
-            return newRowId;
+            Log.d(TAG, "Realms updated=" + updatedCount);
+            Log.d(TAG, "Realms inserted="+ insertedCount);
+            return result;
         }
         //adds character record to database
-        public long updateCharacterAvatar(WOWCharacter character, byte[] avatar) {
+        public long updateCharacterAvatar(WoWCharacter character, byte[] avatar) {
             SQLiteDatabase wdb=getWritableDatabase();
             ContentValues characterValues = new ContentValues();
-            characterValues.put(WOWCharacter.CharacterRecord.COLUMN_NAME_AVATAR, avatar);
+            characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_AVATAR, avatar);
 
             // Insert the new row, returning the primary key value of the new row
             long newRowId = 0;
             try  {
                     Log.d(TAG,"Character Exists, Updating Avatar");
                     //conflict exists, update row where character realm,name,battlegroup and region match
-                    wdb.update( WOWCharacter.CharacterRecord.TABLE_NAME, characterValues,
-                            WOWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
-                                    WOWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
-                                    WOWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
-                                    WOWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?",
+                newRowId =  wdb.update( WoWCharacter.CharacterRecord.TABLE_NAME, characterValues,
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
+                                    WoWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
+                                    WoWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
+                                    WoWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?",
                             new String[] {character.getRealm(),character.getBattlegroup(),character.getName(),String.valueOf(character.getRegion())});
 
             } catch (SQLiteConstraintException e) {
                 newRowId = -1;
             }
             wdb.close();
+            Log.d(TAG, "Profile update complete RowID=" + newRowId);
             return newRowId;
         }
+    //adds character record to database
+    public long updateCharacterProfilemain(WoWCharacter character, byte[] profilemain) {
+        SQLiteDatabase wdb=getWritableDatabase();
+        ContentValues characterValues = new ContentValues();
+        characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_PROFILE, profilemain);
+
+        // Insert the new row, returning the primary key value of the new row
+        long newRowId = 0;
+        try  {
+            Log.d(TAG,"Character Exists, Updating Profilemain");
+            String sqlString= WoWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
+                    WoWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
+                    WoWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
+                    WoWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?";
+            Log.d(TAG,"where "+sqlString);
+            //conflict exists, update row where character realm,name,battlegroup and region match
+            newRowId =  wdb.update( WoWCharacter.CharacterRecord.TABLE_NAME, characterValues,
+                    WoWCharacter.CharacterRecord.COLUMN_NAME_REALM+"=? AND "+
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP+"=? AND "+
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_NAME+"=? AND "+
+                            WoWCharacter.CharacterRecord.COLUMN_NAME_REGION+"=?",
+                    new String[] {character.getRealm(),character.getBattlegroup(),character.getName(),String.valueOf(character.getRegion())});
+
+        } catch (SQLiteConstraintException e) {
+            newRowId = -1;
+        }
+        wdb.close();
+        Log.d(TAG,"Profile update complete RowID="+newRowId);
+        return newRowId;
+    }
     }
 

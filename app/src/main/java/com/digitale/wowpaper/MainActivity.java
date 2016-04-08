@@ -54,14 +54,14 @@ public class MainActivity extends AppCompatActivity {
     static int mTeamID=66;
     //internal database id
     public static int mTeamIndex;
-    ArrayList <WoWCharacter> mCharacters =new ArrayList<>();
+    static ArrayList <WoWCharacter> mCharacters =new ArrayList<>();
      /**
      * Logic members
      */
     private Handler mRefreshHandler = new Handler();
     public static RealmAdapter mRealmAdapter;
     public static CharactersAdapter mCharactersAdapter;
-
+    public static GalleryAdapter mGalleryAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         //load player portraits
         mRealmAdapter = new RealmAdapter(this, mRealmList);
         mCharactersAdapter = new CharactersAdapter(this, mCharacters);
-
+        mGalleryAdapter=new GalleryAdapter(this,mCharacters);
         mActivity = this;
         ui.onActivityCreateSetTheme(this);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
