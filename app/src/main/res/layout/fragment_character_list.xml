@@ -26,14 +26,15 @@
             style="@style/TwoWayView"
                            app:twowayview_layoutManager="GridLayoutManager"
             app:horizontalSpacing="16dp"
-            android:layout_margin="3dp"
+            android:layout_margin="0dip"
             app:twowayview_numRows="1"
             app:twowayview_numColumns="5"
             android:clickable="true"
-            android:padding="-10dip"
+            android:padding="0dip"
             android:paddingEnd="0dip"
             android:paddingStart="0dip"
-            android:layout_weight="1.5" />
+            android:layout_weight="1.5"
+            android:background="#00ffffff" />
 
         <ListView
             android:id="@+id/leagueListView"
