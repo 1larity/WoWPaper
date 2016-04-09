@@ -3,34 +3,70 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-     <item name="colorPrimary">@color/colorPrimary</item>
-     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-     <item name="colorAccent">@color/colorAccent</item>
- </style>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
- <style name="AppTheme.NoActionBar">
-     <item name="windowActionBar">false</item>
-     <item name="windowNoTitle">true</item>
- </style>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
- <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
- <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
- <style name="CustomTabText" parent="TextAppearance.Design.Tab">
-     <item name="android:textSize">10sp</item>
- </style>
- <!-- Everton theme. -->
-<style name="EvertonTheme" parent="AppTheme">
-<item name="android:background">#00369C</item>
-<item name="android:textColor">#FFFFFF</item>
-<item name="android:popupBackground">#FFFFFF</item>
-</style>
-    <!-- Bournmouth theme. -->
-<style name="BournmouthTheme" parent="AppTheme">
-<item name="android:background">#000000</item>
-<item name="android:textColor">#E62333</item>
-    <item name="colorPrimary">#E62333</item>
-</style>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CustomTabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">10dip</item>
+    </style>
+    <!-- Alliance theme. -->
+    <style name="allianceitemTextStyle.AppTheme" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@drawable/alliance_color_item_popup</item>
+        <item name="android:textSize">@dimen/text_content</item>
+    </style>
+
+    <style name="allianceTheme" parent="AppTheme.NoActionBar">
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/alliance_bg_light</item>
+
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/alliance_bg_dark</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated,
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/alliance_fg_light</item>
+
+        <!-- You can also set colorControlNormal, colorControlActivated
+             colorControlHighlight, and colorSwitchThumbNormal. -->
+
+        <item name="android:itemTextAppearance">@style/allianceitemTextStyle.AppTheme</item>
+        <item name="android:background">@color/alliance_bg_light</item>
+        <item name="android:textColor">@color/alliance_fg_light</item>
+        <item name="android:popupBackground">@color/alliance_bg_dark</item>
+        <item name="android:textColorPrimary">@color/alliance_primary_text_material_light</item>
+        <item name="android:colorBackground">@color/alliance_fg_dark</item>
+        <item name="android:textColorPrimaryInverse">@color/alliance_primary_text_material_light
+        </item>
+        <item name="android:windowBackground">@color/horde_fg_light</item>
+    </style>
+    <!-- Horde theme. -->
+    <style name="hordeitemTextStyle.AppTheme" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@drawable/horde_color_item_popup</item>
+        <item name="android:textSize">@dimen/text_content</item>
+    </style>
+
+    <style name="hordeTheme" parent="AppTheme.NoActionBar">
+        <item name="android:itemTextAppearance">@style/hordeitemTextStyle.AppTheme</item>
+        <item name="android:background">@color/horde_bg_light</item>
+        <item name="android:textColor">@color/horde_fg_light</item>
+        <item name="android:popupBackground">@color/horde_bg_light</item>
+        <item name="colorPrimary">@color/horde_fg_light</item>
+        <item name="colorPrimaryDark">@color/horde_fg_dark</item>
+        <item name="android:colorBackground">@color/horde_bg_light</item>
+        <item name="android:textColorPrimary">@color/horde_primary_text_material_light</item>
+    </style>
+
     <style name="TwoWayViewBase">
         <item name="android:background">#999999</item>
     </style>
@@ -49,4 +85,6 @@
         <item name="android:orientation">vertical</item>
         <item name="android:scrollbars">vertical</item>
     </style>
+
+    <dimen name="text_content">12dip</dimen>
 </resources>

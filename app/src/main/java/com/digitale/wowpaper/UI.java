@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -20,8 +21,8 @@ public class UI {
     //current skin identifier
     private int mSkinID=THEME_DEFAULT;
     public final static int THEME_DEFAULT = 0;
-    public final static int THEME_BOURNMOUTH = 1;
-    public final static int THEME_EVERTON = 2;
+    public final static int THEME_HORDE = 1;
+    public final static int THEME_ALLIANCE = 2;
     public  void setSkin(MenuItem item,int themeID, AppCompatActivity activity) {
         Toast.makeText(activity.getApplicationContext(), item + " skin Selected", Toast.LENGTH_LONG).show();
         mSkinID = themeID;
@@ -53,15 +54,17 @@ public class UI {
                     activity.setTheme(R.style.AppTheme);
                     toolbar.setLogo(R.mipmap.ic_launcher);
                     break;
-                case THEME_BOURNMOUTH:
-                    activity.setTheme(R.style.BournmouthTheme);
-                    toolbar.setLogo(R.mipmap.ic_bournemouth);
-                    toolbar.setBackgroundColor(0xFFE62333);
+                case THEME_HORDE:
+                    activity.setTheme(R.style.hordeTheme);
+                    toolbar.setLogo(R.drawable.horde_icon);
+                    toolbar.setBackgroundColor(ContextCompat.getColor(activity, R.color.horde_bg_dark));
+                    MainActivity.mTextColour=(ContextCompat.getColor(activity, R.color.horde_fg_light));
                     break;
-                case THEME_EVERTON:
-                    activity.setTheme(R.style.EvertonTheme);
-                    toolbar.setLogo(R.mipmap.ic_everton);
-                    toolbar.setBackgroundColor(0xFF00369C);
+                case THEME_ALLIANCE:
+                    activity.setTheme(R.style.allianceTheme);
+                    toolbar.setLogo(R.drawable.alliance_icon);
+                    toolbar.setBackgroundColor(ContextCompat.getColor(activity, R.color.alliance_bg_dark));
+                    MainActivity.mTextColour=(ContextCompat.getColor(activity, R.color.alliance_fg_light));
                     break;
             }
 
@@ -75,11 +78,11 @@ public class UI {
         for (int i = 0; i < tabLayout.getChildCount(); i++) {
             View v = tabLayout.getChildAt(i);
             switch (this.mSkinID){
-                case UI.THEME_BOURNMOUTH:
-                    v.setBackgroundResource(R.drawable.tabs_bournmouth);
+                case UI.THEME_HORDE:
+                    v.setBackgroundResource(R.drawable.tabs_horde);
                     break;
-                case UI.THEME_EVERTON:
-                    v.setBackgroundResource(R.drawable.tabs_everton);
+                case UI.THEME_ALLIANCE:
+                    v.setBackgroundResource(R.drawable.tabs_alliance);
             }
         }
     }
@@ -92,7 +95,7 @@ public class UI {
     private void setTabsTextColours(AppCompatActivity activity, TabLayout mTabLayout) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (mTabLayout != null) {
-                if(this.getSkinID()== UI.THEME_BOURNMOUTH) {
+                if(this.getSkinID()== UI.THEME_HORDE) {
                     mTabLayout.setTabTextColors(activity.getResources().getColorStateList(R.color.bournmouth_tab_selector, null));
                 }else{
                     mTabLayout.setTabTextColors(activity.getResources().getColorStateList(R.color.tab_selector, null));
@@ -102,7 +105,7 @@ public class UI {
             if (mTabLayout != null) {
                 //method for older android versions
                 //noinspection deprecation
-                if(this.getSkinID()==UI.THEME_BOURNMOUTH){
+                if(this.getSkinID()==UI.THEME_HORDE){
                     //noinspection deprecation
                     mTabLayout.setTabTextColors(activity.getResources().getColorStateList(R.color.bournmouth_tab_selector));
                 }else{

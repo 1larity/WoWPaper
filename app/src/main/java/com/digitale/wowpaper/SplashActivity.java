@@ -30,10 +30,10 @@ public class SplashActivity extends Activity {
         assert value != null;
         switch (value) {
             case "1":
-                bgImage.setImageResource(R.drawable.bournemouth_load_screen);
+                bgImage.setImageResource(R.drawable.horde_bg);
                 break;
             case "2":
-                bgImage.setImageResource(R.drawable.everton_load_screen);
+                bgImage.setImageResource(R.drawable.alliance_bg);
                 break;
             default:
                 bgImage.setImageResource(R.drawable.bg_load_screen);

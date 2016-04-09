@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static SectionsPagerAdapter mSectionsPagerAdapter;
     public static String mWoWRegionID;
     public static String mCharacterName;
+    public static int mTextColour;
     public ViewPager mViewPager;
     public static MainActivity mActivity;
     public CharactersFragment mCharactersFragment;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         //init database helper
         db = new WoWDatabase(this);
        prefsLoad();
-
+        launchSplash();
         //load player portraits
         mRealmAdapter = new RealmAdapter(this, mRealmList);
         mCharactersAdapter = new CharactersAdapter(this, mCharacters);
@@ -164,11 +165,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int lSkinID;
         switch (item.getItemId()) {
-            case R.id.bournmouthSkin:
-                lSkinID=UI.THEME_BOURNMOUTH;
+            case R.id.hordeSkin:
+                lSkinID=UI.THEME_HORDE;
                 break;
-            case R.id.evertonSkin:
-                lSkinID=UI.THEME_EVERTON;
+            case R.id.allianceSkin:
+                lSkinID=UI.THEME_ALLIANCE;
                 break;
             default:
                 lSkinID=UI.THEME_DEFAULT;

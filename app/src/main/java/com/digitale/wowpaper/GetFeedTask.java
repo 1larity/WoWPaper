@@ -3,7 +3,10 @@ package com.digitale.wowpaper;
 
 import android.app.ProgressDialog;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -33,9 +36,12 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
     public static final int CHARACTERIMAGE = 4;
     public static final int CHARACTERLIST = 5;
     public static final int CHARACTERPROFILE = 6;
+    public static final int IMAGESFORWALLPAPER = 7;
+    private static final String TAG = "GETFEEDTASK ";
     public String avatarPostfix = "-avatar.jpg";
     public String profilePostfix= "-profilemain.jpg";
     public MainActivity activity;
+    public WoWWallpaperService wallPaperService;
     private int mode;
     private ProgressDialog progressDialog;
     public GetFeedTask(MainActivity activity,int mode) {
@@ -43,10 +49,16 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
         this.activity = activity;
         this.mode=mode;
     }
+    public GetFeedTask(WoWWallpaperService wallPaperService,int mode) {
 
+        this.wallPaperService = wallPaperService;
+        this.mode=mode;
+    }
     @Override
     protected void onPreExecute() {
         switch (mode) {
+            case IMAGESFORWALLPAPER:
+                break;
             case CHARACTER:
                 progressDialog = ProgressDialog.show(activity,
                         "Please wait", "Downloading character data for "+activity.mCharacterName);
@@ -136,6 +148,22 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                 }
 
                 break;
+            case IMAGESFORWALLPAPER:
+                //update wallpaper data cache/adaptor datasource with characterlist data
+                wallPaperService.mImages.clear();
+                Cursor wallpaperCursor=wallPaperService.db.getCharacters();
+                wallpaperCursor.moveToFirst();
+                while( !wallpaperCursor.isAfterLast()) {
+                    WoWCharacter cursorWallpaper=new WoWCharacter();
+                    cursorWallpaper.setName(wallpaperCursor.getString(wallpaperCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_NAME)));
+                    cursorWallpaper.setRealm(wallpaperCursor.getString(wallpaperCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_REALM)));
+                    cursorWallpaper.setAvatar(wallpaperCursor.getBlob(wallpaperCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_AVATAR)));
+                    cursorWallpaper.setProfilemain(wallpaperCursor.getBlob(wallpaperCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_PROFILE)));
+                    // The Cursor is now set to the right position
+                    wallPaperService.mImages.add( cursorWallpaper);
+                    wallpaperCursor.moveToNext();
+                }
+                break;
         }
         //format URL to remove spaces
         getURL = getURL.replace(" ", "%20");
@@ -148,7 +176,8 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
         String str = null;
         byte[] image = new byte[0];
         try {
-            if (!isCancelled() && mode != CHARACTERLIST) {
+            //if process not cancelled and we are
+            if (!isCancelled() && mode != CHARACTERLIST && mode !=IMAGESFORWALLPAPER) {
                 response = myClient.execute(get);
                 //if we are getting a character image
                 if (mode == CHARACTERIMAGE || mode == CHARACTERPROFILE) {
@@ -268,7 +297,17 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             GetFeedTask characterListAsyncTask = new GetFeedTask(activity,GetFeedTask.CHARACTERLIST);
             characterListAsyncTask.execute(GetFeedTask.CHARACTERLIST);
             System.out.println("GOT CHARACTER DATA");
-        } else if (result.getMode() == NETWORKFAIL) {
+        }else if(result.getMode()==IMAGESFORWALLPAPER){
+            for(WoWCharacter currentCharacter:wallPaperService.mImages){
+                Log.d(TAG, "wallpaper Cacheing " + currentCharacter.getName());
+                Bitmap bmp = BitmapFactory.decodeByteArray(currentCharacter.getProfilemain(), 0, currentCharacter.getProfilemain().length);
+                Bitmap mutableBitmap = bmp.copy(Bitmap.Config.ARGB_8888, true);
+                mutableBitmap = wallPaperService.getResizedBitmap(mutableBitmap, 0, wallPaperService.getScreenMetrics().getHeight());
+                wallPaperService.mImageCache.add(mutableBitmap);
+            }
+            System.out.println("GOT WALLPAPER DATA");
+        }
+        else if (result.getMode() == NETWORKFAIL) {
             //Oh Google! Enforced statics in abstract classes make baby jesus cry!
             Toast.makeText(activity.getContext(), "Cannot contact server, please try again later",
                     Toast.LENGTH_LONG).show();
@@ -283,7 +322,10 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             activity.mRealmList.clear();
             activity.mRealmList.addAll(activity.mDatabase.getRealms());
             MainActivity.mRealmAdapter.notifyDataSetChanged();
-            System.out.println("GOT REALMLIST");
+            System.out.println("GOT REALMLIST (Listview only)");
+            //add realms data to SQLite database
+            long ID = MainActivity.db.insertRealms(MainActivity.mDatabase.getRealms());
+            System.out.println("UPDATED REALMLIST");
         } else if (result.getMode() == REALMLISTREFRESH) {
             //User changed region, update current serverlist and current server
             activity.mRealmList.clear();
@@ -293,6 +335,9 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             activity.realmListFragment.setServerTextDisplay();
             activity.prefsSave();
             System.out.println("GOT REALMLIST");
+            //add realms data to SQLite database
+            long ID = MainActivity.db.insertRealms(MainActivity.mDatabase.getRealms());
+            System.out.println("UPDATED REALMLIST");
         } else if (result.getMode() == CHARACTERIMAGE) {
             //valid image was retrieved, update UI
             activity.realmListFragment.setAvatarDisplay();

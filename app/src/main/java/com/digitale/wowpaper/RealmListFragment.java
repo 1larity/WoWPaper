@@ -105,6 +105,7 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
         //character text box setup
         Button buttonSearch = (Button) rootView.findViewById(R.id.buttonSearch);
         final EditText searchEditText = (EditText) rootView.findViewById(R.id.editSearchText);
+        searchEditText.setTextColor(MainActivity.mTextColour);
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 

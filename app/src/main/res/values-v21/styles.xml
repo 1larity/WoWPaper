@@ -20,16 +20,27 @@
         <item name="android:textSize">10sp</item>
     </style>
     <!-- Everton theme. -->
-    <style name="EvertonTheme" parent="AppTheme">
+    <style name="allianceTheme" parent="AppTheme">
         <item name="android:background">#00369C</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:popupBackground">#FFFFFF</item>
+        <item name="colorPrimary">@color/alliance_bg_light</item>
+        <item name="colorPrimaryDark">@color/alliance_bg_dark</item>
+        <item name="android:textColorPrimary">@color/alliance_primary_text_material_light</item>
+        <item name="android:colorBackground">@color/alliance_fg_dark</item>
+        <item name="android:textColorPrimaryInverse">@color/alliance_primary_text_material_light
+        </item>
+        <item name="android:windowBackground">@color/horde_fg_light</item>
     </style>
     <!-- Bournmouth theme. -->
-    <style name="BournmouthTheme" parent="AppTheme">
+    <style name="hordeTheme" parent="AppTheme">
         <item name="android:background">#000000</item>
         <item name="android:textColor">#E62333</item>
-        <item name="colorPrimary">#E62333</item>
+        <item name="colorPrimary">@color/horde_fg_light</item>
+        <item name="colorPrimaryDark">@color/horde_fg_dark</item>
+        <item name="android:colorBackground">@color/horde_bg_light</item>
+        <item name="android:statusBarColor">@color/horde_fg_dark</item>
+        <item name="android:textColorPrimary">@color/horde_primary_text_material_light</item>
 
     </style>
 </resources>

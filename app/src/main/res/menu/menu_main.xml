@@ -8,13 +8,13 @@
             android:title="Android"
             android:visible="true"/>
         <item
-            android:id="@+id/evertonSkin"
+            android:id="@+id/allianceSkin"
             android:menuCategory="secondary"
-            android:title="Everton"
+            android:title="Alliance"
             android:visible="true"/>
         <item
-            android:id="@+id/bournmouthSkin"
+            android:id="@+id/hordeSkin"
             android:menuCategory="secondary"
-            android:title="Bournmouth"
+            android:title="Horde"
             android:visible="true"/>
 </menu>

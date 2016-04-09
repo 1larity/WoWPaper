@@ -61,7 +61,7 @@ class Database {
             //insert realms into database
             Log.d(TAG,"inserting realms into database");
             //set the region this server is in to maintain realm>region relationship
-            long ID = MainActivity.db.insertRealms(this.realms);
+       //     long ID = MainActivity.db.insertRealms(this.realms);
         } catch (JSONException e) {
             e.printStackTrace();
         }
