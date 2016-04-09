@@ -12,4 +12,12 @@
     <color name="green">#008000</color>
     <color name="bourneMouth">#FFE62333</color>
     <color name="everton">#FF00369C</color>
+    <color name="alliance_bg_light">#FF1464C7</color>
+    <color name="alliance_bg_dark">#FF00468E</color>
+    <color name="alliance_fg_light">#FFFBEB40</color>
+    <color name="alliance_fg_dark">#FFF0B62E</color>
+    <color name="horde_bg_light">#FF2E2E2E</color>
+    <color name="horde_bg_dark">#FF050505</color>
+    <color name="horde_fg_light">#FFA51618</color>
+    <color name="horde_fg_dark">#FF750E11</color>
 </resources>
