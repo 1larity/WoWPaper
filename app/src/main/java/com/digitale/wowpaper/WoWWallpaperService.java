@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
@@ -50,7 +51,7 @@ public class WoWWallpaperService extends WallpaperService {
     public static WoWDatabase db;
     static ArrayList<WoWCharacter> mImages =new ArrayList<>();
 static ArrayList<Bitmap> mImageCache=new ArrayList<>();
-
+    GetFeedTask setupListAsyncTask;
     @Override
     public WallpaperService.Engine onCreateEngine() {
         db = new WoWDatabase(this);
@@ -67,8 +68,8 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
 
          screenX=getScreenMetrics().getWidth();
          screenY=getScreenMetrics().getHeight();
-        GetFeedTask characterListAsyncTask = new GetFeedTask(this,GetFeedTask.IMAGESFORWALLPAPER);
-        characterListAsyncTask.execute(GetFeedTask.IMAGESFORWALLPAPER);
+        setupListAsyncTask = new GetFeedTask(this,GetFeedTask.IMAGESFORWALLPAPER);
+        setupListAsyncTask.execute(GetFeedTask.IMAGESFORWALLPAPER);
 
             pictureX=740;
             pictureY=550;
@@ -144,6 +145,10 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
             Log.d(TAG, "VISIBLE=" + visible);
             this.visible = visible;
             if (visible) {
+                //if setup is completed and the wallparer has become visible, re-get data
+                if (setupListAsyncTask.getStatus()== AsyncTask.Status.FINISHED){
+                GetFeedTask characterListAsyncTask = new GetFeedTask(WoWWallpaperService.this,GetFeedTask.IMAGESFORWALLPAPER);
+                characterListAsyncTask.execute(GetFeedTask.IMAGESFORWALLPAPER);}
                 imageHandler.post(swapImage);
                 frameHandler.post(drawImage);
 

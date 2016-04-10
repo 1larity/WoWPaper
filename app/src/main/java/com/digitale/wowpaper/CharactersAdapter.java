@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +28,10 @@ public class CharactersAdapter extends BaseAdapter {
 
     private ArrayList<WoWCharacter> mData;
         private static LayoutInflater inflater = null;
-
+private Context mContext;
         public CharactersAdapter(Context context, ArrayList<WoWCharacter> data) {
             this.mData = data;
-
+this.mContext=context;
             inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -73,7 +75,15 @@ public class CharactersAdapter extends BaseAdapter {
             textDetail.setText(mData.get(position).getRealm()+
                                 " "+ regionCursor.getString(1));
             ImageView avatarImage = (ImageView) itemView.findViewById(R.id.imageListAvatar);
-            Bitmap bmp = BitmapFactory.decodeByteArray(mData.get(position).getAvatar(), 0, mData.get(position).getAvatar().length);
+            Bitmap bmp;
+            if(mData.get(position).getProfilemain()!=null) {
+                 bmp = BitmapFactory.decodeByteArray(mData.get(position).getAvatar(), 0, mData.get(position).getAvatar().length);
+            }else{
+                //  if image is null set it to error bitmap
+                Drawable myDrawable = mContext.getResources().getDrawable(R.drawable.firstaid);
+                bmp = ((BitmapDrawable) myDrawable).getBitmap();
+            }
+
             avatarImage.setImageBitmap(bmp);
             return itemView;
         }

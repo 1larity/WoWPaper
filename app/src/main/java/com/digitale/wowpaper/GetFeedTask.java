@@ -146,7 +146,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                     activity.mCharacters.add( cursorCharacter);
                     charactersCursor.moveToNext();
                 }
-
+                //charactersCursor.close();
                 break;
             case IMAGESFORWALLPAPER:
                 //update wallpaper data cache/adaptor datasource with characterlist data
@@ -163,6 +163,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                     wallPaperService.mImages.add( cursorWallpaper);
                     wallpaperCursor.moveToNext();
                 }
+                wallpaperCursor.close();
                 break;
         }
         //format URL to remove spaces

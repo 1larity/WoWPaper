@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -75,7 +77,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.SimpleVi
 
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
-        Bitmap bmp = BitmapFactory.decodeByteArray(mData.get(position).getProfilemain(), 0, mData.get(position).getProfilemain().length);
+        Log.d(TAG,"binding gallery image "+mData.get(position).getName()+" image size "+mData.get(position).getProfilemain());
+        Bitmap bmp;
+        if(mData.get(position).getProfilemain()!=null) {
+             bmp = BitmapFactory.decodeByteArray(mData.get(position).getProfilemain(), 0, mData.get(position).getProfilemain().length);
+        }else{
+          //  if image is null set it to error bitmap
+            Drawable myDrawable = mContext.getResources().getDrawable(R.drawable.firstaid);
+             bmp = ((BitmapDrawable) myDrawable).getBitmap();
+        }
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams( ViewGroup.LayoutParams.WRAP_CONTENT , ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, 0, 0, 0);
         holder.imageProfile.setLayoutParams(params);
