@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
      * Debug members
      */
     public static final boolean DEBUG = true;
-    private static final String TAG ="WOWDB" ;
+    private boolean localDebug=false;
+    private static final String TAG ="MAINACTIVITY" ;
     /**
      * API key required to query blizzard server
      */
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     public static String mWoWRegionID;
     public static String mCharacterName;
     public static int mTextColour;
+    public static int mPlatform=Logger.ANDROID;
     public ViewPager mViewPager;
     public static MainActivity mActivity;
     public CharactersFragment mCharactersFragment;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     public static Database mDatabase=new Database();
     ArrayList <Realm> mRealmList =new ArrayList<>();
     static String mRealmID;
-    public static WoWDatabase db;
+    public static WoWDatabase PrefsDB;
     //data source team id
     static int mTeamID=66;
     //internal database id
@@ -64,11 +66,12 @@ public class MainActivity extends AppCompatActivity {
     public static CharactersAdapter mCharactersAdapter;
     public static GalleryAdapter mGalleryAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //init database helper
-        db = new WoWDatabase(this);
+        PrefsDB = new WoWDatabase(this);
        prefsLoad();
         launchSplash();
         //load player portraits
@@ -143,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        PrefsDB.close();
     }
     @Override
 
@@ -241,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         int lSkinID = lPrefs.getInt("mSkinID", 0);
         ui.setSkin(lSkinID,this);
         //set current regionID from prefs, or default to first region in stock DB
-        mWoWRegionID=lPrefs.getString("mRegionID",MainActivity.db.getCurrentRegionURL(0));
+        mWoWRegionID=lPrefs.getString("mRegionID",MainActivity.PrefsDB.getCurrentRegionURL(0));
         //set current realmID from prefs, or default to null
         mRealmID=lPrefs.getString("mRealmID","");
         if (DEBUG) Log.d(TAG, "LOADING PREFS SkinID " + lSkinID+
@@ -258,9 +262,9 @@ public class MainActivity extends AppCompatActivity {
         ed.putString("mRegionID",mWoWRegionID);
         ed.putString("mRealmID",mRealmID);
         ed.apply();
-        if (DEBUG) Log.d(TAG,"SAVING PREFS SkinID " +  ui.getSkinID()+
+         Logger.writeLog(TAG,"SAVING PREFS SkinID " +  ui.getSkinID()+
                 ", Region "+mWoWRegionID+
-                ", Realm"+mRealmID);
+                ", Realm"+mRealmID,localDebug);
     }
     public static Context getContext(){
         return mActivity.getApplicationContext();

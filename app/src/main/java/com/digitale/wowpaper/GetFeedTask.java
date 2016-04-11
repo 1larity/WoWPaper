@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -38,12 +37,13 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
     public static final int CHARACTERPROFILE = 6;
     public static final int IMAGESFORWALLPAPER = 7;
     private static final String TAG = "GETFEEDTASK ";
-    public String avatarPostfix = "-avatar.jpg";
-    public String profilePostfix= "-profilemain.jpg";
+    private boolean localDebug=false;
     public MainActivity activity;
     public WoWWallpaperService wallPaperService;
     private int mode;
     private ProgressDialog progressDialog;
+
+
     public GetFeedTask(MainActivity activity,int mode) {
 
         this.activity = activity;
@@ -70,13 +70,13 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             case REALMLIST:
                 progressDialog = ProgressDialog.show(activity,
                         "Please wait", "Downloading realms for "+
-                                activity.db.getRegionNameFromURL(activity.mWoWRegionID)+
+                                activity.PrefsDB.getRegionNameFromURL(activity.mWoWRegionID)+
                 " region.");
                 break;
             case REALMLISTREFRESH:
                 progressDialog = ProgressDialog.show(activity,
                         "Please wait", "Downloading realms for "+
-                                activity.db.getRegionNameFromURL(activity.mWoWRegionID)+
+                                activity.PrefsDB.getRegionNameFromURL(activity.mWoWRegionID)+
                                 " region.");
                 break;
             case CHARACTERPROFILE:
@@ -108,18 +108,18 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                 System.out.println("getting character URL " + getURL);
                 break;
             case CHARACTERIMAGE:
-                getURL = MainActivity.db.getCurrentImageRegionURL(
-                        MainActivity.db.getRegionIDFromURL(MainActivity.mWoWRegionID))
-                        + MainActivity.db.getCharacterImageURL(currentCharacter.getName(), currentCharacter.getRealm(),
+                getURL = MainActivity.PrefsDB.getCurrentImageRegionURL(
+                        MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID))
+                        + MainActivity.PrefsDB.getCharacterImageURL(currentCharacter.getName(), currentCharacter.getRealm(),
                         currentCharacter.getBattlegroup(), currentCharacter.getRegion());
                 System.out.println("getting character avatar URL " + getURL);
                 break;
             case CHARACTERPROFILE:
                 //use string replacement to alter ...avatar.jpg to ...profilemain.jpg in image URL
-                String profileURL=MainActivity.db.getCharacterImageURL(currentCharacter.getName(), currentCharacter.getRealm(),
+                String profileURL=MainActivity.PrefsDB.getCharacterImageURL(currentCharacter.getName(), currentCharacter.getRealm(),
                         currentCharacter.getBattlegroup(), currentCharacter.getRegion()).replaceAll("avatar.jpg","profilemain.jpg");
-                getURL = MainActivity.db.getCurrentImageRegionURL(
-                        MainActivity.db.getRegionIDFromURL(MainActivity.mWoWRegionID))
+                getURL = MainActivity.PrefsDB.getCurrentImageRegionURL(
+                        MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID))
                         + profileURL;
                 System.out.println("getting character profile image URL " + getURL);
                 break;
@@ -134,7 +134,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             case CHARACTERLIST:
                 //update mainactivity data cache/adaptor datasource with characterlist data
                 activity.mCharacters.clear();
-                Cursor charactersCursor=activity.db.getCharacters();
+                Cursor charactersCursor=activity.PrefsDB.getCharacters();
                 charactersCursor.moveToFirst();
                 while( !charactersCursor.isAfterLast()) {
                     WoWCharacter cursorCharacter=new WoWCharacter();
@@ -151,7 +151,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             case IMAGESFORWALLPAPER:
                 //update wallpaper data cache/adaptor datasource with characterlist data
                 wallPaperService.mImages.clear();
-                Cursor wallpaperCursor=wallPaperService.db.getCharacters();
+                Cursor wallpaperCursor=wallPaperService.wallpaperDB.getCharacters();
                 wallpaperCursor.moveToFirst();
                 while( !wallpaperCursor.isAfterLast()) {
                     WoWCharacter cursorWallpaper=new WoWCharacter();
@@ -228,7 +228,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
 //        if (str.contains("nok") && str.contains("status")) {
 //            //data contains server error code, tell user and stop
 //            throw new DataNotFoundException("Data error:- Cannot retrieve realm list for region "
-//                    + activity.db.getRegionNameFromURL(activity.mWoWRegionID));
+//                    + activity.PrefsDB.getRegionNameFromURL(activity.mWoWRegionID));
 //        } else {
         //response is ok, decode and store character JSON
         activity.mDatabase.setAvatar(image);
@@ -242,7 +242,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
 //        if (str.contains("nok") && str.contains("status")) {
 //            //data contains server error code, tell user and stop
 //            throw new DataNotFoundException("Data error:- Cannot retrieve realm list for region "
-//                    + activity.db.getRegionNameFromURL(activity.mWoWRegionID));
+//                    + activity.PrefsDB.getRegionNameFromURL(activity.mWoWRegionID));
 //        } else {
         //response is ok, decode and store character JSON
         activity.mDatabase.setProfileImage(image);
@@ -256,7 +256,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
         if (str.contains("nok") && str.contains("status")) {
             //data contains server error code, tell user and stop
             throw new DataNotFoundException("Data error:- Cannot retrieve realm list for region "
-                    + activity.db.getRegionNameFromURL(activity.mWoWRegionID));
+                    + activity.PrefsDB.getRegionNameFromURL(activity.mWoWRegionID));
         } else {
             //response is ok, decode and store character JSON
             activity.mDatabase.realmFromJSON(str);
@@ -299,12 +299,14 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             characterListAsyncTask.execute(GetFeedTask.CHARACTERLIST);
             System.out.println("GOT CHARACTER DATA");
         }else if(result.getMode()==IMAGESFORWALLPAPER){
+            wallPaperService.mImageCache.clear();
             for(WoWCharacter currentCharacter:wallPaperService.mImages){
-                Log.d(TAG, "wallpaper Cacheing " + currentCharacter.getName());
-                Bitmap bmp = BitmapFactory.decodeByteArray(currentCharacter.getProfilemain(), 0, currentCharacter.getProfilemain().length);
-                Bitmap mutableBitmap = bmp.copy(Bitmap.Config.ARGB_8888, true);
+                Logger.writeLog(TAG, "wallpaper Cacheing " + currentCharacter.getName(),localDebug);
+                Bitmap mutableBitmap = BitmapFactory.decodeByteArray(currentCharacter.getProfilemain(), 0, currentCharacter.getProfilemain().length);
+                mutableBitmap = mutableBitmap.copy(Bitmap.Config.RGB_565, true);
                 mutableBitmap = wallPaperService.getResizedBitmap(mutableBitmap, 0, wallPaperService.getScreenMetrics().getHeight());
                 wallPaperService.mImageCache.add(mutableBitmap);
+             //   mutableBitmap.recycle();
             }
             System.out.println("GOT WALLPAPER DATA");
         }
@@ -325,7 +327,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             MainActivity.mRealmAdapter.notifyDataSetChanged();
             System.out.println("GOT REALMLIST (Listview only)");
             //add realms data to SQLite database
-            long ID = MainActivity.db.insertRealms(MainActivity.mDatabase.getRealms());
+            long ID = MainActivity.PrefsDB.insertRealms(MainActivity.mDatabase.getRealms());
             System.out.println("UPDATED REALMLIST");
         } else if (result.getMode() == REALMLISTREFRESH) {
             //User changed region, update current serverlist and current server
@@ -337,7 +339,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             activity.prefsSave();
             System.out.println("GOT REALMLIST");
             //add realms data to SQLite database
-            long ID = MainActivity.db.insertRealms(MainActivity.mDatabase.getRealms());
+            long ID = MainActivity.PrefsDB.insertRealms(MainActivity.mDatabase.getRealms());
             System.out.println("UPDATED REALMLIST");
         } else if (result.getMode() == CHARACTERIMAGE) {
             //valid image was retrieved, update UI

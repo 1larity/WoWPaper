@@ -33,7 +33,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.SimpleVi
    // private final TwoWayView mRecyclerView;
   //  private static LayoutInflater inflater = null;
     private final Context mContext;
-  //  private final int mLayoutId;
+    private boolean localDebug=false;
+    //  private final int mLayoutId;
 
     public static class SimpleViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageProfile;
@@ -77,7 +78,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.SimpleVi
 
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
-        Log.d(TAG,"binding gallery image "+mData.get(position).getName()+" image size "+mData.get(position).getProfilemain());
+        Logger.writeLog(TAG,"binding gallery image "+mData.get(position).getName()+" image size "+mData.get(position).getProfilemain(),localDebug);
         Bitmap bmp;
         if(mData.get(position).getProfilemain()!=null) {
              bmp = BitmapFactory.decodeByteArray(mData.get(position).getProfilemain(), 0, mData.get(position).getProfilemain().length);

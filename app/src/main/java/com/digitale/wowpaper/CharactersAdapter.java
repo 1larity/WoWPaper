@@ -11,14 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
 import java.util.ArrayList;
-
-import static com.digitale.wowpaper.MainActivity.mDatabase;
 
 /**
  * Created by Rich on 13/03/2016.
@@ -66,7 +63,7 @@ this.mContext=context;
             textCharacterName.setText(mData.get(position).getName());
             TextView textDetail = (TextView) itemView.findViewById(R.id.cCharacterDetails);
             //get list of regions
-            Cursor regionCursor=MainActivity.db.getRegions();
+            Cursor regionCursor=MainActivity.PrefsDB.getRegions();
             //iterate through cursor until the regionID matches the character's
             while (mData.get(position).getRegion()!= regionCursor.getInt(0)){
                 regionCursor.moveToNext();
@@ -74,6 +71,7 @@ this.mContext=context;
 
             textDetail.setText(mData.get(position).getRealm()+
                                 " "+ regionCursor.getString(1));
+
             ImageView avatarImage = (ImageView) itemView.findViewById(R.id.imageListAvatar);
             Bitmap bmp;
             if(mData.get(position).getProfilemain()!=null) {

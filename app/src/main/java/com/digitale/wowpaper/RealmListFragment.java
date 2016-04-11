@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -76,22 +75,22 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
         });
         //region spinner setup
         Spinner spinnerRegion=(Spinner) rootView.findViewById(R.id.spinnerRegion);
-        wowRegions = db.getRegions();
+        wowRegions = PrefsDB.getRegions();
         SpinnerAdapter adapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 wowRegions,
                 new String[] {"geo_zone_name"},
                 new int[] {android.R.id.text1},0);
         spinnerRegion.setAdapter(adapter);
-        Log.i(TAG, "SETSPINNER" + mWoWRegionID + "REG NAME" + db.getRegionIDFromURL(mWoWRegionID)+
-                " INDEX "+db.getRegionIDFromURL(mWoWRegionID));
-        spinnerRegion.setSelection( db.getRegionIDFromURL(mWoWRegionID)-1, false);
+        Log.i(TAG, "SETSPINNER" + mWoWRegionID + "REG NAME" + PrefsDB.getRegionIDFromURL(mWoWRegionID)+
+                " INDEX "+ PrefsDB.getRegionIDFromURL(mWoWRegionID));
+        spinnerRegion.setSelection( PrefsDB.getRegionIDFromURL(mWoWRegionID)-1, false);
         //spinner click event need to set global Region ID and update server list
         spinnerRegion.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         //set global region ID
-                        mWoWRegionID = db.getCurrentRegionURL(position);
+                        mWoWRegionID = PrefsDB.getCurrentRegionURL(position);
                         //refresh server list
                         GetFeedTask realmsAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.REALMLISTREFRESH);
                         realmsAsyncTask.execute(GetFeedTask.REALMLISTREFRESH);

@@ -33,7 +33,7 @@ public class WoWWallpaperService extends WallpaperService {
     private static final String TAG = "WALLPAPER";
     float mWallpaperXStep;
     float mWallpaperYStep;
-    static float mXOffset;
+    static float mXOffset=.5f;
     int pictureX;
     int pictureY;
     /**
@@ -48,13 +48,13 @@ public class WoWWallpaperService extends WallpaperService {
     GestureDetector mGestureDetector;
     //number of launcher pages(needed for scrolling wallpaper with launcher)
     static int mNumberOfPages =3;
-    public static WoWDatabase db;
+    public static WoWDatabase wallpaperDB;
     static ArrayList<WoWCharacter> mImages =new ArrayList<>();
 static ArrayList<Bitmap> mImageCache=new ArrayList<>();
     GetFeedTask setupListAsyncTask;
     @Override
     public WallpaperService.Engine onCreateEngine() {
-        db = new WoWDatabase(this);
+        wallpaperDB = new WoWDatabase(this);
         // Create an object of our Custom Gesture Detector Class
         CustomGestureDetector customGestureDetector = new CustomGestureDetector();
         // Create a GestureDetector
@@ -239,6 +239,8 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
         public void onDestroy() {
             super.onDestroy();
             frameHandler.removeCallbacks(drawImage);
+            imageHandler.removeCallbacks(swapImage);
+            wallpaperDB.close();
         }
     }
     /**

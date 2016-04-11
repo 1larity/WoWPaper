@@ -24,8 +24,12 @@ public class WoWDatabase extends SQLiteAssetHelper {
         private static final String DATABASE_NAME = "wow.db";
         private static final int DATABASE_VERSION = 4;
         private static final String TAG = "WOWDATABASE ";
+    private static final long WAITDURATION =500 ;
+    //used to control write locking the DB
+    private boolean mWriteLock;
+    private boolean localDebug=false;
 
-        public WoWDatabase(Context context) {
+    public WoWDatabase(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
             // you can use an alternate constructor to specify a database location
@@ -54,6 +58,8 @@ public class WoWDatabase extends SQLiteAssetHelper {
         }
     //get list of all characters
     public Cursor getCharacters() {
+        writeLock();
+
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         String sqlTables = "wow_character";
@@ -61,8 +67,8 @@ public class WoWDatabase extends SQLiteAssetHelper {
         Cursor c = qb.query(db, null, null, null,
                 null, null, null);
         c.moveToFirst();
+        mWriteLock=false;
         return c;
-
     }
         //get API URL for a given region ID number
         public String getCurrentRegionURL(int position) {
@@ -135,6 +141,7 @@ public class WoWDatabase extends SQLiteAssetHelper {
         }
         //adds character record to database
         public long insertCharacter(WoWCharacter character) {
+            writeLock();
             SQLiteDatabase wdb=getWritableDatabase();
             ContentValues characterValues = new ContentValues();
             characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_NAME, character.getName());
@@ -173,10 +180,13 @@ public class WoWDatabase extends SQLiteAssetHelper {
                      newRowId = -1;
             }
             wdb.close();
+            mWriteLock=false;
             return newRowId;
         }
         //adds realm record to database
         public long insertRealms(ArrayList<Realm> realms) {
+            writeLock();
+
             SQLiteDatabase wdb=getWritableDatabase();
             long result=0;
             int insertedCount=0;
@@ -203,15 +213,15 @@ public class WoWDatabase extends SQLiteAssetHelper {
                             realmValues, SQLiteDatabase.CONFLICT_IGNORE);
                     //insert returns -1 if row alreday exists
                     if (newRowId == -1) {
-                        Log.d(TAG, "Realm "+realmValues.get(Realm.RealmRecord.COLUMN_NAME_NAME)+" exists, updating");
+                        Logger.writeLog(TAG, "Realm "+realmValues.get(Realm.RealmRecord.COLUMN_NAME_NAME)+" exists, updating",localDebug);
                         //conflict exists, update row where realm name and realm region match
                         newRowId = wdb.update(Realm.RealmRecord.TABLE_NAME, realmValues,
                                 "name=? AND region_id=?",
                                 new String[]{realm.getName(), realm.getRegionID()});
                         updatedCount=updatedCount+1;
                     }else{
-                        Log.d(TAG, "Realm "+realmValues.get(Realm.RealmRecord.COLUMN_NAME_NAME)+
-                                " does not exist, inserted at row"+newRowId);
+                        Logger.writeLog(TAG, "Realm "+realmValues.get(Realm.RealmRecord.COLUMN_NAME_NAME)+
+                                " does not exist, inserted at row"+newRowId,localDebug);
                         insertedCount=insertedCount+1;
                     }
 
@@ -223,10 +233,26 @@ public class WoWDatabase extends SQLiteAssetHelper {
             wdb.close();
             Log.d(TAG, "Realms updated=" + updatedCount);
             Log.d(TAG, "Realms inserted="+ insertedCount);
+            mWriteLock=false;
             return result;
         }
-        //adds character record to database
+
+    private void writeLock() {
+        // hold processing here until lock is freed
+        if(mWriteLock){
+            try {
+                Log.d(TAG,"Waiting for lock");
+                Thread.sleep(WAITDURATION);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        mWriteLock=true;
+    }
+
+    //adds character record to database
         public long updateCharacterAvatar(WoWCharacter character, byte[] avatar) {
+            writeLock();
             SQLiteDatabase wdb=getWritableDatabase();
             ContentValues characterValues = new ContentValues();
             characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_AVATAR, avatar);
@@ -248,10 +274,12 @@ public class WoWDatabase extends SQLiteAssetHelper {
             }
             wdb.close();
             Log.d(TAG, "Profile update complete RowID=" + newRowId);
+            mWriteLock=false;
             return newRowId;
         }
     //adds character record to database
     public long updateCharacterProfilemain(WoWCharacter character, byte[] profilemain) {
+        writeLock();
         SQLiteDatabase wdb=getWritableDatabase();
         ContentValues characterValues = new ContentValues();
         characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_PROFILE, profilemain);
@@ -278,6 +306,7 @@ public class WoWDatabase extends SQLiteAssetHelper {
         }
         wdb.close();
         Log.d(TAG,"Profile update complete RowID="+newRowId);
+        mWriteLock=false;
         return newRowId;
     }
     }

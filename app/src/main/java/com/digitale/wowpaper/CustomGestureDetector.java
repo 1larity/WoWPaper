@@ -1,7 +1,6 @@
 package com.digitale.wowpaper;
 
 import android.animation.ValueAnimator;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -12,46 +11,46 @@ import android.view.MotionEvent;
 class CustomGestureDetector extends GestureDetector.SimpleOnGestureListener {
 
     private static final String TAG ="GESTURE DETECTOR " ;
-
+    private static boolean localDebug=false;
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-        Log.d(TAG,"onSingleTapConfirmed");
+        Logger.writeLog(TAG,"onSingleTapConfirmed",localDebug);
         return true;
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        Log.d(TAG, "onDoubleTap");
+        Logger.writeLog(TAG, "onDoubleTap",localDebug);
         return true;
     }
 
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
-        Log.d(TAG, "onDoubleTapEvent");
+        Logger.writeLog(TAG, "onDoubleTapEvent",localDebug);
         return true;
     }
 
     @Override
     public boolean onDown(MotionEvent e) {
-        Log.d(TAG, "onDown");
+        Logger.writeLog(TAG, "onDown",localDebug);
         return true;
     }
 
     @Override
     public void onShowPress(MotionEvent e) {
-        Log.d(TAG, "onShowPress");
+        Logger.writeLog(TAG, "onShowPress",localDebug);
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        Log.d(TAG, "onSingleTapUp");
+        Logger.writeLog(TAG, "onSingleTapUp",localDebug);
         return true;
     }
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        Log.d(TAG, "onScroll");
+        Logger.writeLog(TAG, "onScroll",localDebug);
         final float newXOffset = WoWWallpaperService.mXOffset + distanceX / WoWWallpaperService.screenX / WoWWallpaperService.mNumberOfPages;
         if (newXOffset > 1) {
             WoWWallpaperService.mXOffset = 1f;
@@ -66,12 +65,12 @@ class CustomGestureDetector extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public void onLongPress(MotionEvent e) {
-        Log.d(TAG, "onLongPress");
+        Logger.writeLog(TAG, "onLongPress",localDebug);
     }
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        Log.d(TAG, "onFling");
+        Logger.writeLog(TAG, "onFling",localDebug);
         float endValue = velocityX > 0
                 ? (WoWWallpaperService.mXOffset - (WoWWallpaperService.mXOffset % (1 / WoWWallpaperService.mNumberOfPages)))
                 : (WoWWallpaperService.mXOffset - (WoWWallpaperService.mXOffset % (1 / WoWWallpaperService.mNumberOfPages)) + (1 / WoWWallpaperService.mNumberOfPages));

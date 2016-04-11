@@ -51,14 +51,14 @@ public class CharactersFragment extends Fragment implements FragmentNotifier{
          characterListView.setAdapter(MainActivity.mCharactersAdapter);
         characterListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String str = MainActivity.mDatabase.getCharacter().getThumbnail();
-                System.out.println("TEAM HTTP" + str);
-                //get team id from last part of URL
-                str = str.substring(str.lastIndexOf("/") + 1, str.length());
-                System.out.println("TEAM ID" + str);
-                MainActivity.mTeamID = Integer.valueOf(str);
-                MainActivity.mTeamIndex = position;
-                System.out.println("POSITION" + position + " TEAM ID " + MainActivity.mTeamID);
+//                String str = MainActivity.mDatabase.getCharacter().getThumbnail();
+//                System.out.println("TEAM HTTP" + str);
+//                //get team id from last part of URL
+//                str = str.substring(str.lastIndexOf("/") + 1, str.length());
+//                System.out.println("TEAM ID" + str);
+//                MainActivity.mTeamID = Integer.valueOf(str);
+//                MainActivity.mTeamIndex = position;
+             //   System.out.println("POSITION" + position + " TEAM ID " + MainActivity.mTeamID);
                 //   GetFeedTask teamAsyncTask = new GetFeedTask((MainActivity) getActivity());
                 //   teamAsyncTask.execute(GetFeedTask.TEAM);
                 //   GetFeedTask playersAsyncTask = new GetFeedTask((MainActivity) getActivity());

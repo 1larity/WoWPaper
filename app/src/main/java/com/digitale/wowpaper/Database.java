@@ -61,7 +61,7 @@ class Database {
             //insert realms into database
             Log.d(TAG,"inserting realms into database");
             //set the region this server is in to maintain realm>region relationship
-       //     long ID = MainActivity.db.insertRealms(this.realms);
+       //     long ID = MainActivity.PrefsDB.insertRealms(this.realms);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -82,9 +82,9 @@ class Database {
 
         this.character = new Gson().fromJson(data, type);
         //set the region of this character to maintain character>region relationship
-        this.character.setRegion(MainActivity.db.getRegionIDFromURL(MainActivity.mWoWRegionID));
+        this.character.setRegion(MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID));
         //insert character into database
-        long ID = MainActivity.db.insertCharacter(this.character);
+        long ID = MainActivity.PrefsDB.insertCharacter(this.character);
         result = ID;
         if (DEBUG) {
             Log.i(TAG, "Character" + ID + " " + data);
@@ -94,23 +94,23 @@ class Database {
     }
 
     /**
-     * sets the current character avatar image and store in SQLite db
+     * sets the current character avatar image and store in SQLite PrefsDB
      * @param characterAvatar
      */
     public void setAvatar(byte[] characterAvatar) {
         Log.d(TAG,"Commiting avatar data (size)"+characterAvatar.length);
         this.character.setAvatar(characterAvatar);
         //update character avatar image
-        long ID = MainActivity.db.updateCharacterAvatar(this.character, characterAvatar);
+        long ID = MainActivity.PrefsDB.updateCharacterAvatar(this.character, characterAvatar);
     }
     /**
-     * sets the current character profile image and store in SQLite db
+     * sets the current character profile image and store in SQLite PrefsDB
      * @param characterProfile
      */
     public void setProfileImage(byte[] characterProfile) {
         Log.d(TAG,"Commiting profile data (size)"+characterProfile.length);
         this.character.setProfilemain(characterProfile);
         //update character avatar image
-        long ID = MainActivity.db.updateCharacterProfilemain(this.character, characterProfile);
+        long ID = MainActivity.PrefsDB.updateCharacterProfilemain(this.character, characterProfile);
     }
 }

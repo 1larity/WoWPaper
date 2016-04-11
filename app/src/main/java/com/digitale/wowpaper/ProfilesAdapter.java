@@ -59,7 +59,7 @@ public class ProfilesAdapter extends BaseAdapter {
             textCharacterName.setText(mData.get(position).getName());
             TextView textDetail = (TextView) itemView.findViewById(R.id.cCharacterDetails);
             //get list of regions
-            Cursor regionCursor=MainActivity.db.getRegions();
+            Cursor regionCursor=MainActivity.PrefsDB.getRegions();
             //iterate through cursor until the regionID matches the character's
             while (mData.get(position).getRegion()!= regionCursor.getInt(0)){
                 regionCursor.moveToNext();
