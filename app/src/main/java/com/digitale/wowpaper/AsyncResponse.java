@@ -6,5 +6,5 @@ package com.digitale.wowpaper;
  */
 
 public interface AsyncResponse {
-    void processFinish(String output);
+    void processFinish(int output, Object data);
 }

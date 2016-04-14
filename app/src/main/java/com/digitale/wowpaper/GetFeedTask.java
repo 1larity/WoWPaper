@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Get JSON data from incrowd Website.
@@ -156,7 +157,8 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                 break;
             case SQLREALMLIST:
                 //update mainactivity data cache/adaptor datasource with characterlist data
-                MainActivity.mRealmList.clear();
+
+                ArrayList<Realm> lRealmlist=new ArrayList<>();
                 String query = Realm.RealmRecord.COLUMN_NAME_REGIONID + "='" + MainActivity.mWoWRegionID + "'";
                 Cursor realmCursor = MainActivity.PrefsDB.getTableContents(Realm.RealmRecord.TABLE_NAME, query);
                 realmCursor.moveToFirst();
@@ -167,14 +169,15 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                     cursorRealm.setFavourite(realmCursor.getInt(realmCursor.getColumnIndexOrThrow(Realm.RealmRecord.COLUMN_NAME_FAVOURITE)));
                     cursorRealm.set_id(realmCursor.getInt(realmCursor.getColumnIndexOrThrow(Realm.RealmRecord.COLUMN_NAME_ID)));
                     // The Cursor is now set to the right position
-                    MainActivity.mRealmList.add(cursorRealm);
+                    lRealmlist.add(cursorRealm);
                     realmCursor.moveToNext();
                 }
+                results.data=lRealmlist;
                 break;
 
             case SQLCHARACTERLIST:
                 //update mainactivity data cache/adaptor datasource with characterlist data
-                MainActivity.mCharacters.clear();
+                ArrayList<WoWCharacter> lCharacterlist=new ArrayList<>();
                 Cursor charactersCursor = MainActivity.PrefsDB.getTableContents(WoWCharacter.CharacterRecord.TABLE_NAME, null);
                 charactersCursor.moveToFirst();
                 while (!charactersCursor.isAfterLast()) {
@@ -187,13 +190,15 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                     cursorCharacter.setProfilemain(charactersCursor.getBlob(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_PROFILE)));
                     cursorCharacter.setBattlegroup(charactersCursor.getString(charactersCursor.getColumnIndexOrThrow(WoWCharacter.CharacterRecord.COLUMN_NAME_BATTLEGROUP)));
                     // The Cursor is now set to the right position
-                    MainActivity.mCharacters.add(cursorCharacter);
+                    lCharacterlist.add(cursorCharacter);
                     charactersCursor.moveToNext();
                 }
                 //charactersCursor.close();
+                results.data=lCharacterlist;
                 break;
 
             case SQLIMAGESFORWALLPAPER:
+                //TODO make "return function" as above, rather than modifying caller's data
                 //update wallpaper data cache/adaptor datasource with characterlist data
                 WoWWallpaperService.mImages.clear();
                 Cursor wallpaperCursor = WoWWallpaperService.wallpaperDB.getTableContents(WoWCharacter.CharacterRecord.TABLE_NAME, null);
@@ -246,7 +251,7 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
                     decodeCharacter(str);
 
                 } else if (mode == REALMLIST) {
-                    decodeRealms(str);
+                    results.data=decodeRealms(str);
                 } else if (mode == CHARACTERIMAGE) {
                     decodeCharacterImage(image, profile);
                 }
@@ -284,18 +289,22 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
     }
 
     //check server supplied valid data then store
-    private void decodeRealms(String str) throws JSONException, DataNotFoundException {
+    private ArrayList<Realm> decodeRealms(String str) throws JSONException, DataNotFoundException {
+        ArrayList<Realm> results;
         System.out.println("Realm DATA" + str);
         JSONObject jResponse = new JSONObject(str);
         //check for error response in data
         if (str.contains("nok") && str.contains("status")) {
+            results=null;
             //data contains server error code, tell user and stop
             throw new DataNotFoundException("Data error:- Cannot retrieve realm list for region "
                     + MainActivity.PrefsDB.getRegionNameFromURL(MainActivity.mWoWRegionID));
+
         } else {
             //response is ok, decode and store character JSON
-            MainActivity.mDatabase.realmFromJSON(str);
+            results=MainActivity.mDatabase.realmFromJSON(str);
         }
+        return results;
     }
 
     //check server supplied valid data then store
@@ -322,23 +331,21 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
         System.out.println("REFRESHUI mode " + result.getMode());
         if (progressDialog != null) progressDialog.dismiss();
         if (result.getMode() == CHARACTER) {
-            delegate.processFinish("CHARACTER");
+            delegate.processFinish(CHARACTER, result.data);
             System.out.println("DB CHARACTER CONTENTS" + MainActivity.mDatabase.getCharacter().getName());
-            //refresh character list data
-            GetFeedTask characterListAsyncTask = new GetFeedTask(activity, GetFeedTask.SQLCHARACTERLIST);
-            characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
+
             Logger.writeLog(TAG, "Got character data from web", localDebug);
 
         } else if (result.getMode() == SQLIMAGESFORWALLPAPER) {
             WoWWallpaperService.mImageCache.clear();
-            Drawable bitmapError = activity.getContext().getResources().getDrawable(R.drawable.firstaid);
-            Bitmap mutableBitmap;
+             Bitmap mutableBitmap;
+            Drawable bitmapError = wallPaperService.getResources().getDrawable(R.drawable.firstaid);
             for (WoWCharacter currentCharacter : WoWWallpaperService.mImages) {
                 Logger.writeLog(TAG, "wallpaper Cacheing " + currentCharacter.getName(), localDebug);
                 if (currentCharacter.getProfilemain() != null) {
                     mutableBitmap = BitmapFactory.decodeByteArray(currentCharacter.getProfilemain(), 0, currentCharacter.getProfilemain().length);
                 } else {
-                    mutableBitmap = ((BitmapDrawable) MainActivity.bitmapError).getBitmap();
+                    mutableBitmap = ((BitmapDrawable) bitmapError).getBitmap();
                 }
                 mutableBitmap = mutableBitmap.copy(Bitmap.Config.RGB_565, true);
                 mutableBitmap = wallPaperService.getResizedBitmap(mutableBitmap, 0, wallPaperService.getScreenMetrics().getHeight());
@@ -361,46 +368,25 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
 
         } else if (result.getMode() == REALMLIST) {
             //update the serverlist ui only
-            delegate.processFinish("REALMLIST");
-            MainActivity.mRealmList.clear();
-            MainActivity.mRealmList.addAll(MainActivity.mDatabase.getRealms());
-            MainActivity.mRealmAdapter.notifyDataSetChanged();
-            MainActivity.mRealmID = MainActivity.mRealmList.get(0).getName();
-            MainActivity.realmListFragment.setServerTextDisplay();
-            activity.prefsSave();
+            delegate.processFinish(REALMLIST, result.data);
             Logger.writeLog(TAG, "Got realmlist from web", localDebug);
 
         } else if (result.getMode() == CHARACTERIMAGE) {
+            delegate.processFinish(CHARACTERIMAGE,result.data);
             //valid image was retrieved, update UI
             MainActivity.realmListFragment.setAvatarDisplay();
-            //   MainActivity.mCharacters.clear();
-            //          MainActivity.mCharactersAdapter.notifyDataSetChanged();
-            //      MainActivity.mGalleryAdapter.notifyDataSetChanged();
-
-            GetFeedTask characterListAsyncTask = new GetFeedTask(GetFeedTask.SQLCHARACTERLIST);
-            characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
-            //TODO work out why gallery/avatar is not being updated when changing pictures
-
             Logger.writeLog(TAG, "Got character images from web.", localDebug);
 
         } else if (result.getMode() == SQLCHARACTERLIST) {
-            //image data has changed, tell UI about it
-            MainActivity.mCharactersAdapter.notifyDataSetChanged();
-            MainActivity.mGalleryAdapter.notifyDataSetChanged();
+            delegate.processFinish(SQLCHARACTERLIST,result.data);
             Logger.writeLog(TAG, "Got character list from SQLite", localDebug);
 
         } else if (result.getMode() == SQLREALMLIST) {
-            if (MainActivity.mRealmList.size() > 0) {
-                MainActivity.mRealmAdapter.notifyDataSetChanged();
-                delegate.processFinish("POPULATED SQLREALMLIST");
-            } else {
-                delegate.processFinish("EMPTY SQLREALMLIST");
-            }
+            delegate.processFinish(SQLREALMLIST, result.data);
             Logger.writeLog(TAG, "Got realmlist from SQLite", localDebug);
 
         } else if (result.getMode() == DELETERECORD) {
-            GetFeedTask characterListAsyncTask = new GetFeedTask(GetFeedTask.SQLCHARACTERLIST);
-            characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
+            delegate.processFinish(DELETERECORD, result.data);
             Logger.writeLog(TAG, "Deleted Record", localDebug);
         }
     }

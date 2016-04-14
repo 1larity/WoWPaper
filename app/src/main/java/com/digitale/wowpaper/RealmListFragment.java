@@ -96,7 +96,7 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
                 });
         //character text box setup
         final EditText searchEditText = (EditText) rootView.findViewById(R.id.editSearchText);
-        searchEditText.setTextColor(MainActivity.mTextColour);
+        searchEditText.setTextColor(UI.getmTextColourPrimary());
         //setup search button
         Button buttonSearch = (Button) rootView.findViewById(R.id.buttonSearch);
         buttonSearch.setOnClickListener(new View.OnClickListener() {

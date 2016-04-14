@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static com.digitale.wowpaper.MainActivity.getContext;
 import static com.digitale.wowpaper.MainActivity.mCharacterName;
 import static com.digitale.wowpaper.MainActivity.mCharactersFragment;
 
@@ -42,6 +43,10 @@ public class CharactersAdapter extends BaseAdapter {
 
     public CharactersAdapter(Context context, ArrayList<WoWCharacter> data) {
         this.mData = data;
+        if(mData==null){
+            Logger.error(TAG,"error, dataset empty");
+        }
+
         this.mContext = context;
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -84,14 +89,16 @@ public class CharactersAdapter extends BaseAdapter {
         //Display additional character details
         TextView textDetail = (TextView) itemView.findViewById(R.id.cCharacterDetails);
         //get list of regions
-        Cursor regionCursor = MainActivity.PrefsDB.getRegions();
-        //iterate through cursor until the regionID matches the character's
-        while (mData.get(position).getRegion_id() != regionCursor.getInt(0)) {
-            regionCursor.moveToNext();
+//        Cursor regionCursor = MainActivity.PrefsDB.getRegions();
+//        //iterate through cursor until the regionID matches the character's
+//        while (mData.get(position).getRegion_id() != regionCursor.getInt(0)) {
+//            regionCursor.moveToNext();
+//        }
+        if(mData!=null){
+            textDetail.setText(mData.get(position).getRealm() +
+                    " " + MainActivity.PrefsDB.getRegionNameFromID(mData.get(position).getRegion_id()));
         }
 
-        textDetail.setText(mData.get(position).getRealm() +
-                " " + regionCursor.getString(1));
         //Display avatar image
         ImageView avatarImage = (ImageView) itemView.findViewById(R.id.imageListAvatar);
         Bitmap bmp;
@@ -128,7 +135,7 @@ public class CharactersAdapter extends BaseAdapter {
                 characterImageAsyncTask.currentCharacter.setRegion_id(mData.get(staticPosition).getRegion_id());
                 characterImageAsyncTask.currentCharacter.setBattlegroup(mData.get(staticPosition).getBattlegroup());
                 //set callback to mainactivity (we will need to update UI and post execute there)
-                //    characterImageAsyncTask.delegate =(MainActivity)mCharactersFragment.getActivity();
+                characterImageAsyncTask.delegate =(MainActivity)mCharactersFragment.getActivity();
                 characterImageAsyncTask.execute(GetFeedTask.CHARACTERIMAGE);
             }
 
@@ -164,7 +171,7 @@ public class CharactersAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 GetFeedTask deleteAsyncTask = new GetFeedTask(mData.get(lPosition).get_id(), GetFeedTask.DELETERECORD);
-                // deleteAsyncTast.delegate=MainActivity.
+                deleteAsyncTask.delegate=(MainActivity) MainActivity.mCharactersFragment.getActivity();
                 deleteAsyncTask.execute(GetFeedTask.DELETERECORD);
                 alert.dismiss();
             }

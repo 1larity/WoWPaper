@@ -7,6 +7,7 @@ package com.digitale.wowpaper;
 public class TaskResult {
     int mode;
     String resultCode;
+    Object data;
     /**
      * Blank Constructor
      */

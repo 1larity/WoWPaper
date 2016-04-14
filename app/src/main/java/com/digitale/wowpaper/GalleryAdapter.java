@@ -47,6 +47,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.SimpleVi
 
     public GalleryAdapter(Context context,  ArrayList<WoWCharacter> data) {
         this.mData = data;
+        if(mData==null){
+            Logger.error(TAG,"error, dataset empty");
+        }
         mContext = context;
 //        inflater = (LayoutInflater) context
 //                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -78,11 +81,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.SimpleVi
 
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
-        Logger.writeLog(TAG,"binding gallery image "+mData.get(position).getName()+" image size "+mData.get(position).getProfilemain(),localDebug);
+
         Bitmap bmp;
         if(mData.get(position).getProfilemain()!=null) {
+            Logger.writeLog(TAG,"binding gallery image "+mData.get(position).getName()+" image size "+mData.get(position).getProfilemain(),localDebug);
              bmp = BitmapFactory.decodeByteArray(mData.get(position).getProfilemain(), 0, mData.get(position).getProfilemain().length);
         }else{
+            Logger.error(TAG,"Image null, substituting error image");
           //  if image is null set it to error bitmap
             Drawable myDrawable = mContext.getResources().getDrawable(R.drawable.firstaid);
              bmp = ((BitmapDrawable) myDrawable).getBitmap();

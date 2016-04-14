@@ -19,6 +19,7 @@ class Database {
     private static final boolean DEBUG = false;
     public ArrayList<Realm> realms = new ArrayList<>();
     public WoWCharacter character = new WoWCharacter();
+    public ArrayList<WoWCharacter> characters = new ArrayList<>();
     private boolean localDebug=true;
 
 
@@ -47,7 +48,7 @@ class Database {
         this.character = character;
     }
 
-    public void realmFromJSON(String data) {
+    public ArrayList<Realm> realmFromJSON(String data) {
         JSONArray jRealms;
         try {
             JSONObject jRealmData = new JSONObject(data);
@@ -69,6 +70,7 @@ class Database {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return this.realms;
     }
 
     /**

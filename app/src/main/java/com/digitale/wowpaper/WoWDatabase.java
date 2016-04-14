@@ -125,6 +125,18 @@ public class WoWDatabase extends SQLiteAssetHelper {
             c.moveToFirst();
             return c.getString(0);
         }
+    //get friendly name of region when supplied the ID for that API
+    public String getRegionNameFromID(int regionID){
+        SQLiteDatabase db = getReadableDatabase();
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        String [] sqlSelect = { "geo_zone_name"};
+        String sqlTables = "api_connection_details";
+        qb.setTables(sqlTables);
+        Cursor c = qb.query(db, sqlSelect, "_id='"+regionID+"'", null,
+                null, null, null);
+        c.moveToFirst();
+        return c.getString(0);
+    }
         //get API image URL for a given region ID number
         public String getCurrentImageRegionURL(int regionID) {
             Logger.writeLog(TAG,"Attempting to get region URL for ID "+regionID,localDebug);

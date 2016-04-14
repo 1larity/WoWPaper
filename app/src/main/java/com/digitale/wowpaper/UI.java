@@ -26,7 +26,7 @@ public class UI {
 
 
 
-    private int mTextColourPrimary;
+    private static int mTextColourPrimary;
     private int mTextColourSecondary;
     private int mBackGroundColourPrimary;
     private int mBackGroundColourSecondary;
@@ -60,6 +60,10 @@ public class UI {
                 case THEME_DEFAULT:
                     activity.setTheme(R.style.AppTheme);
                     toolbar.setLogo(R.mipmap.ic_launcher);
+                    this.mTextColourPrimary=(ContextCompat.getColor(activity, R.color.colorPrimaryDark ));
+                    this.mTextColourSecondary=(ContextCompat.getColor(activity, R.color.alliance_primary_text_material_light));
+                    this.mBackGroundColourPrimary =(ContextCompat.getColor(activity, R.color.colorPrimaryDark));
+                    this.mBackGroundColourSecondary =(ContextCompat.getColor(activity, R.color.horde_bg_dark));
                     break;
                 case THEME_HORDE:
                     activity.setTheme(R.style.hordeTheme);
@@ -135,7 +139,7 @@ public class UI {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
-    public int getmTextColourPrimary() {
+    public static int getmTextColourPrimary() {
         return mTextColourPrimary;
     }
 

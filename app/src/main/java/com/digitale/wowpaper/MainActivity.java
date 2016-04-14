@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -41,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
     private static SectionsPagerAdapter mSectionsPagerAdapter;
     public static String mWoWRegionID;
     public static String mCharacterName;
-    public static int mTextColour;
     public static int mPlatform = Logger.ANDROID;
     public ViewPager mViewPager;
     public static MainActivity mActivity;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
     public static RealmAdapter mRealmAdapter;
     public static CharactersAdapter mCharactersAdapter;
     public static GalleryAdapter mGalleryAdapter;
-    static Drawable bitmapError;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
         if (!DEBUG) {
             launchSplash();
         }
-        bitmapError = this.getResources().getDrawable(R.drawable.firstaid);
         mRealmAdapter = new RealmAdapter(this, mRealmList);
         mCharactersAdapter = new CharactersAdapter(this, mCharacters);
         mGalleryAdapter = new GalleryAdapter(this, mCharacters);
@@ -153,34 +152,70 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
         realmlistAsyncTask.execute(GetFeedTask.SQLREALMLIST);
 
         GetFeedTask characterListAsyncTask = new GetFeedTask(this, GetFeedTask.SQLCHARACTERLIST);
+        characterListAsyncTask.delegate = this;
         characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
     }
 
     @Override
-    //this override the implemented method from asyncTask
-    public void processFinish(String output) {
+    //this overrides the implemented method from asyncTask
+    public void processFinish(int output, Object data) {
         Logger.writeLog(TAG, "Main Activity got notification feedtask done " + output, localDebug);
-        //Here you will receive the result fired from async class
+        //receive the result fired from async class
         //of onPostExecute(result) method.
-        if (output.equals("EMPTY SQLREALMLIST")) {
-            //no realm data in database probably first run
-            //so lets pull data from web
-            GetFeedTask realmlistAsyncTask = new GetFeedTask(this, GetFeedTask.REALMLIST);
-            //this to set delegate/listener back to this class
-            realmlistAsyncTask.delegate = this;
-            //execute getting the realmlist
-            realmlistAsyncTask.execute(GetFeedTask.REALMLIST);
-        } else if (output.equals("REALMLIST")) {
+        if (output==GetFeedTask.SQLREALMLIST) {
+            if(mRealmList.size()<=0) {
+                //no realm data in database probably first run
+                //so lets pull data from web
+                GetFeedTask realmlistAsyncTask = new GetFeedTask(this, GetFeedTask.REALMLIST);
+                //this to set delegate/listener back to this class
+                realmlistAsyncTask.delegate = this;
+                //execute getting the realmlist
+                realmlistAsyncTask.execute(GetFeedTask.REALMLIST);
+            }else{
+                //there was data in the database update UI elements
+              mRealmAdapter.notifyDataSetChanged();
+            }
+
+        } else if (output==GetFeedTask.REALMLIST) {
+            //got realmlist data, update UI
+            mRealmList.clear();
+            mRealmList.addAll((Collection<? extends Realm>) data);
+            mRealmAdapter.notifyDataSetChanged();
+            mRealmID = mRealmList.get(0).getName();
+            realmListFragment.setServerTextDisplay();
+            prefsSave();
             //we had to get realmlist from web so now we need to put it in SQLite
             GetFeedTask setRealmlistAsyncTask = new GetFeedTask();
             setRealmlistAsyncTask.delegate = this;
             //execute setting the realmlist
             setRealmlistAsyncTask.execute(GetFeedTask.SETREALMLIST);
-        }else if (output.equals("CHARACTER")) {
+
+        }else if (output==GetFeedTask.CHARACTER) {
             //we have a character, get its images from web
             GetFeedTask characterImageAsyncTask = new GetFeedTask(this, GetFeedTask.CHARACTERIMAGE);
             characterImageAsyncTask.currentCharacter=mDatabase.getCharacter();
+            characterImageAsyncTask.delegate=this;
             characterImageAsyncTask.execute(GetFeedTask.CHARACTERIMAGE);
+
+        }else if (output==GetFeedTask.SQLCHARACTERLIST) {
+            //update adapter datsource
+            mCharacters.clear();
+            mCharacters.addAll((Collection<? extends WoWCharacter>) data);
+            //image data has changed, tell UI about it
+            MainActivity.mCharactersAdapter.notifyDataSetChanged();
+            MainActivity.mGalleryAdapter.notifyDataSetChanged();
+
+        }else if (output==GetFeedTask.DELETERECORD) {
+            GetFeedTask characterListAsyncTask = new GetFeedTask(GetFeedTask.SQLCHARACTERLIST);
+            characterListAsyncTask.delegate = this;
+            characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
+
+        }else if (output==GetFeedTask.CHARACTERIMAGE) {
+            //refresh character list data
+            GetFeedTask characterListAsyncTask = new GetFeedTask(this, GetFeedTask.SQLCHARACTERLIST);
+            //this to set delegate/listener back to this class
+            characterListAsyncTask.delegate = this;
+            characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
 
         }
     }
