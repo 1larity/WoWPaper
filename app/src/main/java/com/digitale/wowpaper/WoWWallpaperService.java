@@ -2,11 +2,7 @@ package com.digitale.wowpaper;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -33,25 +29,27 @@ public class WoWWallpaperService extends WallpaperService {
     private static final String TAG = "WALLPAPER";
     float mWallpaperXStep;
     float mWallpaperYStep;
-    static float mXOffset=.5f;
+    static float mXOffset = .5f;
     int pictureX;
     int pictureY;
     /**
      * width of screen
      */
-    static int  screenX;
+    static int screenX;
     /**
      * height of screen
      */
-    static int  screenY;
+    static int screenY;
     View.OnTouchListener gestureListener;
     GestureDetector mGestureDetector;
     //number of launcher pages(needed for scrolling wallpaper with launcher)
-    static int mNumberOfPages =3;
+    static int mNumberOfPages = 3;
     public static WoWDatabase wallpaperDB;
-    static ArrayList<WoWCharacter> mImages =new ArrayList<>();
-static ArrayList<Bitmap> mImageCache=new ArrayList<>();
+    static ArrayList<WoWCharacter> mImages = new ArrayList<>();
+    static ArrayList<Bitmap> mImageCache = new ArrayList<>();
     GetFeedTask setupListAsyncTask;
+    private boolean localDebug=true;
+
     @Override
     public WallpaperService.Engine onCreateEngine() {
         wallpaperDB = new WoWDatabase(this);
@@ -66,22 +64,24 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
             }
         };
 
-         screenX=getScreenMetrics().getWidth();
-         screenY=getScreenMetrics().getHeight();
-        setupListAsyncTask = new GetFeedTask(this,GetFeedTask.IMAGESFORWALLPAPER);
-        setupListAsyncTask.execute(GetFeedTask.IMAGESFORWALLPAPER);
+        screenX = getScreenMetrics().getWidth();
+        screenY = getScreenMetrics().getHeight();
+        setupListAsyncTask = new GetFeedTask(this, GetFeedTask.SQLIMAGESFORWALLPAPER);
+        setupListAsyncTask.execute(GetFeedTask.SQLIMAGESFORWALLPAPER);
 
-            pictureX=740;
-            pictureY=550;
-            return new WoWWallpaperEngine();
+        pictureX = 740;
+        pictureY = 550;
+        return new WoWWallpaperEngine();
 
     }
 
     private class WoWWallpaperEngine extends WallpaperService.Engine {
+        private static final int FULLSCREEN = 0;
+        private static final int LETTERBOXED = 1;
         private final int frameDuration = 1000;
         private final int imageDuration = 5000;
         //if lancher pages are sliding
-        private boolean mSliding=false;
+        private boolean mSliding = false;
         private SurfaceHolder holder;
         private boolean visible;
         //handler for controlling frame swaps
@@ -95,43 +95,45 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
         /**
          * flag to inform if we need to load/resize a new bitmap to lower cpu use
          */
-        private boolean mImageChanged=true;
+        private boolean mImageChanged = true;
         private Bitmap mutableBitmap;
 
         public WoWWallpaperEngine() {
             Drawable myDrawable = getResources().getDrawable(R.drawable.firstaid);
-             mErrorBitmap = ((BitmapDrawable) myDrawable).getBitmap();
-            imageHandler= new Handler();
+            mErrorBitmap = ((BitmapDrawable) myDrawable).getBitmap();
+            imageHandler = new Handler();
             frameHandler = new Handler();
 
         }
+
         @Override
-        public void onOffsetsChanged (float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-            mSliding=true;
-          //calculate number of launcher pages
-           mNumberOfPages=(int)(1 / xOffsetStep)+1;
+        public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
+            mSliding = true;
+            //calculate number of launcher pages
+            mNumberOfPages = (int) (1 / xOffsetStep) + 1;
             //if wallpaper is being displayed in LWP picker xOffsetStep is undefined
             //so fix value
-            if(mNumberOfPages<=0){
-                mNumberOfPages=1;
+            if (mNumberOfPages <= 0) {
+                mNumberOfPages = 1;
             }
-         //   Log.d(TAG,"Pages= "+ mNumberOfPages);
+            //   Log.d(TAG,"Pages= "+ mNumberOfPages);
             if (isOnOffsetsChangedWorking == false && xOffset != 0.0f && xOffset != 0.5f) {
                 isOnOffsetsChangedWorking = true;
             }
 
             if (isOnOffsetsChangedWorking == true) {
-              //  Log.d(TAG,"Offset method works! "+xOffset+" "+xPixelOffset+" "+xOffsetStep);
-                mXOffset=xOffset;
+                //  Log.d(TAG,"Offset method works! "+xOffset+" "+xPixelOffset+" "+xOffsetStep);
+                mXOffset = xOffset;
             }
         }
+
         //awful hack because HTC and Samsung decided to do their own thing with the launcher
-        @Override public void onTouchEvent(MotionEvent event) {
+        @Override
+        public void onTouchEvent(MotionEvent event) {
             if (!isOnOffsetsChangedWorking) {
                 mGestureDetector.onTouchEvent(event);
             }
         }
-
 
 
         @Override
@@ -140,15 +142,17 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
             this.holder = surfaceHolder;
 
         }
+
         @Override
         public void onVisibilityChanged(boolean visible) {
             Log.d(TAG, "VISIBLE=" + visible);
             this.visible = visible;
             if (visible) {
                 //if setup is completed and the wallparer has become visible, re-get data
-                if (setupListAsyncTask.getStatus()== AsyncTask.Status.FINISHED){
-                GetFeedTask characterListAsyncTask = new GetFeedTask(WoWWallpaperService.this,GetFeedTask.IMAGESFORWALLPAPER);
-                characterListAsyncTask.execute(GetFeedTask.IMAGESFORWALLPAPER);}
+                if (setupListAsyncTask.getStatus() == AsyncTask.Status.FINISHED) {
+                    GetFeedTask characterListAsyncTask = new GetFeedTask(WoWWallpaperService.this, GetFeedTask.SQLIMAGESFORWALLPAPER);
+                    characterListAsyncTask.execute(GetFeedTask.SQLIMAGESFORWALLPAPER);
+                }
                 imageHandler.post(swapImage);
                 frameHandler.post(drawImage);
 
@@ -157,29 +161,31 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
                 frameHandler.removeCallbacks(drawImage);
             }
         }
+
         private Runnable swapImage = new Runnable() {
 
             public void run() {
                 swap();
             }
         };
-        private void swap( ) {
-            mImageChanged=false;
-            int previousImageID=mImageNumber;
+
+        private void swap() {
+            mImageChanged = false;
+            int previousImageID = mImageNumber;
             if (visible) {
                 //init RNG
-                Random rng=new Random();
+                Random rng = new Random();
 
                 //if image cache is not empty
-                if(mImageCache.size()>0) {
+                if (mImageCache.size() > 0) {
                     //generate RN between 0 and number of images in the image cache
                     mImageNumber = rng.nextInt(mImageCache.size());
-                }else{
+                } else {
                     //Image cache is empty set imagenumber to error state
-                    mImageNumber=-1;
+                    mImageNumber = -1;
                 }
-                if(previousImageID!=mImageNumber){
-                    mImageChanged=true;
+                if (previousImageID != mImageNumber) {
+                    mImageChanged = true;
                 }
                 imageHandler.removeCallbacks(swapImage);
                 imageHandler.postDelayed(swapImage, imageDuration);
@@ -188,53 +194,64 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
 
         private Runnable drawImage = new Runnable() {
             Canvas canvas;
+
             public void run() {
                 draw(canvas);
             }
         };
+
         private void draw(Canvas canvas) {
             if (visible) {
 
-                 canvas = holder.lockCanvas();
+                canvas = holder.lockCanvas();
 
                 canvas.save();
 
-              //  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-
-                //if imagecache is not empty
-                if (mImageNumber>=0) {
-                     mutableBitmap = mImageCache.get(mImageNumber);
-                } else{
+                //  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                if (mImageNumber >= 0) {
+                    mutableBitmap = mImageCache.get(mImageNumber);
+                } else {
                     mutableBitmap = mErrorBitmap;
                 }
 
+                int wallPaperMode = LETTERBOXED;
+                switch (wallPaperMode) {
+                    case FULLSCREEN:
+                        canvas.drawBitmap(mutableBitmap, -((mutableBitmap.getWidth() - screenX) * mXOffset), 0, null);
+                        break;
+                    case LETTERBOXED:
+                        mutableBitmap = getResizedBitmap(mutableBitmap, 0, getScreenMetrics().getHeight() - getStatusBarHeight() - getNavigationBarHeight());
+                        canvas.drawBitmap(mutableBitmap, -((mutableBitmap.getWidth() - screenX) * mXOffset),  getStatusBarHeight(), null);
+                        break;
+                }
+                //if imagecache is not empty
 
-                canvas.drawBitmap(mutableBitmap, -((mutableBitmap.getWidth()- screenX) * mXOffset) , 0, null);
                 canvas.restore();
                 holder.unlockCanvasAndPost(canvas);
 
 //mutableBitmap.recycle();
                 frameHandler.removeCallbacks(drawImage);
                 //if launcher is sliding, speed up framerate to make scroll smoother
-                if(mSliding) {
+                if (mSliding) {
                     frameHandler.postDelayed(drawImage, 10);
                     //make handler/runnable to restore framerate in 1 second
-                    Handler slidingReset=new Handler();
+                    Handler slidingReset = new Handler();
                     frameHandler.postDelayed(drawImage, frameDuration);
-                     Runnable sliderReset = new Runnable() {
-                            public void run() {
-                            mSliding=false;
+                    Runnable sliderReset = new Runnable() {
+                        public void run() {
+                            mSliding = false;
                         }
                     };
                     //reset sliding flag in 1 second
-                slidingReset.postDelayed(sliderReset,1000);
-                }else{
+                    slidingReset.postDelayed(sliderReset, 1000);
+                } else {
 
-                frameHandler.postDelayed(drawImage, frameDuration);
-            }
+                    frameHandler.postDelayed(drawImage, frameDuration);
+                }
             }
 
         }
+
         @Override
         public void onDestroy() {
             super.onDestroy();
@@ -243,28 +260,31 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
             wallpaperDB.close();
         }
     }
+
     /**
      * For applications that use multiple virtual screens showing a wallpaper,
      * specify the step size between virtual screens. For example, if the
      * launcher has 3 virtual screens, it would specify an xStep of 0.5,
      * since the X offset for those screens are 0.0, 0.5 and 1.0
+     *
      * @param xStep The X offset delta from one screen to the next one
      * @param yStep The Y offset delta from one screen to the next one
      */
 
     public void setWallpaperOffsetSteps(float xStep, float yStep) {
-        Log.i(TAG,"Wallpaper scroll offset changed "+xStep);
+        Log.i(TAG, "Wallpaper scroll offset changed " + xStep);
         mWallpaperXStep = xStep;
         mWallpaperYStep = yStep;
     }
+
     //get correct screen metrics regardless of API
-    public ScreenMetrics getScreenMetrics (){
+    public ScreenMetrics getScreenMetrics() {
         DisplayMetrics metrics = new DisplayMetrics();
-        Display display =((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+        Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
         int realWidth;
         int realHeight;
 
-        if (Build.VERSION.SDK_INT >= 17){
+        if (Build.VERSION.SDK_INT >= 17) {
             //new pleasant way to get real metrics
             DisplayMetrics realMetrics = new DisplayMetrics();
             display.getRealMetrics(realMetrics);
@@ -290,13 +310,11 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
             realWidth = display.getWidth();
             realHeight = display.getHeight();
         }
-        ScreenMetrics screenMetrics=new ScreenMetrics();
+        ScreenMetrics screenMetrics = new ScreenMetrics();
         screenMetrics.setWidth(realWidth);
         screenMetrics.setHeight(realHeight);
-    return screenMetrics;
+        return screenMetrics;
     }
-
-
 
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
@@ -307,9 +325,9 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
         //constain aspect if newwidth/height is 0
         if (newWidth == 0) {
             scaleWidth = scaleHeight;
-        } else if (newHeight == 0){
+        } else if (newHeight == 0) {
             scaleHeight = scaleWidth;
-    }
+        }
         // CREATE A MATRIX FOR THE MANIPULATION
         Matrix matrix = new Matrix();
         // RESIZE THE BIT MAP
@@ -318,7 +336,25 @@ static ArrayList<Bitmap> mImageCache=new ArrayList<>();
         // "RECREATE" THE NEW BITMAP
         Bitmap resizedBitmap = Bitmap.createBitmap(
                 bm, 0, 0, width, height, matrix, false);
-     //   bm.recycle();
+        //   bm.recycle();
         return resizedBitmap;
+    }
+
+    private int getStatusBarHeight() {
+        // status bar height
+        int statusBarHeight = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+        }
+        return statusBarHeight;
+    }
+
+    private int getNavigationBarHeight() {
+        // navigation bar height
+        int navigationBarHeight = 0;
+       navigationBarHeight=(getScreenMetrics().getHeight())/6;
+
+        return navigationBarHeight;
     }
 }

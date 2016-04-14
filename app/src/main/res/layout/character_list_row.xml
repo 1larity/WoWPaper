@@ -14,22 +14,21 @@
         android:id="@+id/cCharacterName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:singleLine="true"
         android:text="Character Name"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignTop="@+id/buttonCharacterRefresh"
+        android:layout_toEndOf="@+id/imageListAvatar" />
 
     <TextView
         android:id="@+id/cCharacterDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/cCharacterName"
         android:text="Character details."
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:layout_below="@+id/cCharacterName"
+        android:layout_toEndOf="@+id/imageListAvatar" />
 
     <ImageView
         android:layout_width="40dip"
@@ -38,7 +37,36 @@
         android:layout_weight=".1"
         android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkboxCharacterFavourite"
+        android:button="@drawable/selector_favourite"
+        android:layout_gravity="center_vertical"
+        android:layout_alignTop="@+id/buttonCharacterRefresh"
         android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:layout_width="48dip"
+        android:layout_height="48dip"
+        android:text="Del"
+        android:id="@+id/buttonCharacterDelete"
+        android:layout_gravity="center_vertical"
+        android:layout_alignTop="@+id/checkboxCharacterFavourite"
+        android:layout_toLeftOf="@+id/checkboxCharacterFavourite"
+        android:layout_toStartOf="@+id/checkboxCharacterFavourite"
+        android:src="@drawable/delete" />
+
+    <ImageButton
+        android:layout_width="48dip"
+        android:layout_height="48dip"
+        android:text="Del"
+        android:id="@+id/buttonCharacterRefresh"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/down"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/buttonCharacterDelete" />
 
 </RelativeLayout>

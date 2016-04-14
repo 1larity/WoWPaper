@@ -6,23 +6,24 @@ import android.provider.BaseColumns;
  * Created by Rich on 02/04/2016.
  */
 public final class WoWCharacter {
-    int _id;
-    long lastModified;
-    String name;
-    String realm;
-    String battlegroup;
-    int wowClass;
-    int race;
-    int gender;
-    int level;
-    int achievementPoints;
-    String thumbnail;
-    String calcClass;
-    int faction;
-    int totalHonorableKills;
-    int region_id;
-    byte[] avatar;
-    byte[] profilemain;
+    private long _id;
+    private long lastModified;
+    private String name;
+    private String realm;
+    private String battlegroup;
+    private int wowClass;
+    private int race;
+    private int gender;
+    private int level;
+    private int achievementPoints;
+    private String thumbnail;
+    private String calcClass;
+    private int faction;
+    private int totalHonorableKills;
+    private int region_id;
+    private byte[] avatar;
+    private byte[] profilemain;
+    private int favourite;
     //abstract class for referencing SQLite columns/table
     //makes it easy to change underlying tables
     public static abstract class CharacterRecord implements BaseColumns {
@@ -44,14 +45,27 @@ public final class WoWCharacter {
         public static final String COLUMN_NAME_REGION = "region_id";
         public static final String COLUMN_NAME_AVATAR = "avatar";
         public static final String COLUMN_NAME_PROFILE = "profilemain";
+        public static final String COLUMN_NAME_FAVOURITE = "favourite";
         public static final String COLUMN_NAME_NULLABLE = "";
     }
+
+
     public WoWCharacter(){}
-    public int getRegion() {
+    public int getFavourite() {
+        return favourite;
+    }
+
+    public int getRegion_id() {
         return region_id;
     }
 
-    public void setRegion(int region) {
+
+
+    public void setFavourite(int favourite) {
+        this.favourite = favourite;
+    }
+
+    public void setRegion_id(int region) {
         this.region_id = region;
     }
 
@@ -70,11 +84,11 @@ public final class WoWCharacter {
     public void setProfilemain(byte[] profilemain) {
         this.profilemain = profilemain;
     }
-    public int get_id() {
+    public long get_id() {
         return _id;
     }
 
-    public void set_id(int _id) {
+    public void set_id(long _id) {
         this._id = _id;
     }
     public long getLastModified() {

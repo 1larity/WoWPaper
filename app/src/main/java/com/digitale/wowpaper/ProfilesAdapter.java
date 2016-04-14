@@ -61,7 +61,7 @@ public class ProfilesAdapter extends BaseAdapter {
             //get list of regions
             Cursor regionCursor=MainActivity.PrefsDB.getRegions();
             //iterate through cursor until the regionID matches the character's
-            while (mData.get(position).getRegion()!= regionCursor.getInt(0)){
+            while (mData.get(position).getRegion_id()!= regionCursor.getInt(0)){
                 regionCursor.moveToNext();
             }
 

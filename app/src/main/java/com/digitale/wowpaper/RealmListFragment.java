@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -33,9 +34,11 @@ import static com.digitale.wowpaper.MainActivity.*;
  * Realmlist Fragment.
  */
 public class RealmListFragment extends Fragment implements FragmentNotifier{
-    private static final String TAG ="REALM FRAGMENT " ;
+    private static final String TAG ="REALM LIST FRAGMENT " ;
     private static final boolean DEBUG =true ;
     View rootView = null;
+    private boolean localDebug=true;
+
     public RealmListFragment() {
     }
 
@@ -61,18 +64,7 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
                 return false;
             }
         });
-        //listview click event
-        seasonListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mRealmID = mDatabase.getRealms().get(position).getName();
-                Log.i(TAG, "POSITION " + position + " server ID " + mRealmID);
-                setServerTextDisplay();
-                SharedPreferences prefs = RealmListFragment.this.getActivity().getPreferences(MODE_PRIVATE);
-                SharedPreferences.Editor ed = prefs.edit();
-                ed.putString("mRealmID", mRealmID);
-                ed.apply();
-            }
-        });
+
         //region spinner setup
         Spinner spinnerRegion=(Spinner) rootView.findViewById(R.id.spinnerRegion);
         wowRegions = PrefsDB.getRegions();
@@ -92,8 +84,9 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
                         //set global region ID
                         mWoWRegionID = PrefsDB.getCurrentRegionURL(position);
                         //refresh server list
-                        GetFeedTask realmsAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.REALMLISTREFRESH);
-                        realmsAsyncTask.execute(GetFeedTask.REALMLISTREFRESH);
+                        GetFeedTask realmsAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.REALMLIST);
+                        realmsAsyncTask.delegate =(MainActivity) getActivity();
+                        realmsAsyncTask.execute(GetFeedTask.REALMLIST);
                         if (DEBUG)
                             Log.i(TAG, " POSITION" + position + " Region URL " + mWoWRegionID);
                     }
@@ -102,21 +95,56 @@ public class RealmListFragment extends Fragment implements FragmentNotifier{
                     }
                 });
         //character text box setup
-        Button buttonSearch = (Button) rootView.findViewById(R.id.buttonSearch);
         final EditText searchEditText = (EditText) rootView.findViewById(R.id.editSearchText);
         searchEditText.setTextColor(MainActivity.mTextColour);
+        //setup search button
+        Button buttonSearch = (Button) rootView.findViewById(R.id.buttonSearch);
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 UI.hideKeyboardFrom(getContext(), v);
-                mCharacterName=String.valueOf(searchEditText.getText());
+                String name=String.valueOf(searchEditText.getText());
                 GetFeedTask characterDataAsyncTask = new GetFeedTask((MainActivity) getActivity(),GetFeedTask.CHARACTER);
+                //set Feedtask character (search term)
+                characterDataAsyncTask.currentCharacter.setName(name);
+                characterDataAsyncTask.currentCharacter.setRealm( MainActivity.mRealmID);
+                characterDataAsyncTask.currentCharacter.setRegion_id(MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID));
+                //set post execute callback
+                characterDataAsyncTask.delegate = (MainActivity) getActivity();
                 characterDataAsyncTask.execute(GetFeedTask.CHARACTER);
 
             }
 
         });
+
+        //Test function to fill character database
+        Button buttonFill = (Button) rootView.findViewById(R.id.buttonFill);
+        buttonFill.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //hide keyboard
+                UI.hideKeyboardFrom(getContext(), v);
+                for(String currentCharacter:MainActivity.testSubjects) {
+                    Logger.writeLog(TAG,"Inserting test subject "+currentCharacter,localDebug);
+                    GetFeedTask characterDataAsyncTask = new GetFeedTask((MainActivity) getActivity(), GetFeedTask.CHARACTER);
+
+                    characterDataAsyncTask.currentCharacter.setName(currentCharacter);
+                    characterDataAsyncTask.currentCharacter.setRealm("Silvermoon");
+                    characterDataAsyncTask.currentCharacter.setRegion_id(MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID));
+                    characterDataAsyncTask.delegate = (MainActivity) getActivity();
+                    characterDataAsyncTask.execute(GetFeedTask.CHARACTER);
+                    if (characterDataAsyncTask.getStatus() == AsyncTask.Status.RUNNING) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+        });
         setServerTextDisplay();
+
         return rootView;
     }
 

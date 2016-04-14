@@ -23,6 +23,13 @@ public class UI {
     public final static int THEME_DEFAULT = 0;
     public final static int THEME_HORDE = 1;
     public final static int THEME_ALLIANCE = 2;
+
+
+
+    private int mTextColourPrimary;
+    private int mTextColourSecondary;
+    private int mBackGroundColourPrimary;
+    private int mBackGroundColourSecondary;
     public  void setSkin(MenuItem item,int themeID, AppCompatActivity activity) {
         Toast.makeText(activity.getApplicationContext(), item + " skin Selected", Toast.LENGTH_LONG).show();
         mSkinID = themeID;
@@ -58,13 +65,19 @@ public class UI {
                     activity.setTheme(R.style.hordeTheme);
                     toolbar.setLogo(R.drawable.horde_icon);
                     toolbar.setBackgroundColor(ContextCompat.getColor(activity, R.color.horde_bg_dark));
-                    MainActivity.mTextColour=(ContextCompat.getColor(activity, R.color.horde_fg_light));
+                    this.mTextColourPrimary=(ContextCompat.getColor(activity, R.color.horde_fg_light));
+                    this.mTextColourSecondary=(ContextCompat.getColor(activity, R.color.horde_fg_dark));
+                    this.mBackGroundColourPrimary =(ContextCompat.getColor(activity, R.color.horde_bg_light));
+                    this.mBackGroundColourSecondary =(ContextCompat.getColor(activity, R.color.horde_bg_dark));
                     break;
                 case THEME_ALLIANCE:
                     activity.setTheme(R.style.allianceTheme);
                     toolbar.setLogo(R.drawable.alliance_icon);
                     toolbar.setBackgroundColor(ContextCompat.getColor(activity, R.color.alliance_bg_dark));
-                    MainActivity.mTextColour=(ContextCompat.getColor(activity, R.color.alliance_fg_light));
+                    this.mTextColourPrimary=(ContextCompat.getColor(activity, R.color.alliance_fg_light));
+                    this.mTextColourSecondary=(ContextCompat.getColor(activity, R.color.alliance_fg_dark));
+                    this.mBackGroundColourPrimary =(ContextCompat.getColor(activity, R.color.alliance_bg_light));
+                    this.mBackGroundColourSecondary =(ContextCompat.getColor(activity, R.color.alliance_bg_dark));
                     break;
             }
 
@@ -121,5 +134,36 @@ public class UI {
     public static void hideKeyboardFrom(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+    public int getmTextColourPrimary() {
+        return mTextColourPrimary;
+    }
+
+    public void setmTextColourPrimary(int mTextColourPrimary) {
+        this.mTextColourPrimary = mTextColourPrimary;
+    }
+
+    public int getmTextColourSecondary() {
+        return mTextColourSecondary;
+    }
+
+    public void setmTextColourSecondary(int mTextColourSecondary) {
+        this.mTextColourSecondary = mTextColourSecondary;
+    }
+
+    public int getmBackGroundColourPrimary() {
+        return mBackGroundColourPrimary;
+    }
+
+    public void setmBackGroundColourPrimary(int mBackGroundColourPrimary) {
+        this.mBackGroundColourPrimary = mBackGroundColourPrimary;
+    }
+
+    public int getmBackGroundColourSecondary() {
+        return mBackGroundColourSecondary;
+    }
+
+    public void setmBackGroundColourSecondary(int mBackGroundColourSecondary) {
+        this.mBackGroundColourSecondary = mBackGroundColourSecondary;
     }
 }

@@ -9,6 +9,8 @@ import java.util.ArrayList;
  * container for realm data
  */
 public class Realm {
+
+    int _id;
     String type;
     String population;
     boolean queue;
@@ -20,6 +22,7 @@ public class Realm {
     String timezone;
     String[] connected_realms;
     String regionID;
+    int favourite;
     /**
      * Blank Constructor
      */
@@ -39,6 +42,7 @@ public class Realm {
         public static final String COLUMN_NAME_LOCALE = "locale";
         public static final String COLUMN_NAME_TIMEZONE = "timezone";
         public static final String COLUMN_NAME_REGIONID = "region_id";
+        public static final String COLUMN_NAME_FAVOURITE = "favourite";
         public static final String COLUMN_NAME_NULLABLE = "";
     }
     public Realm(String type, String population, boolean queue, boolean status, String name, String slug, String battlegroup,
@@ -58,6 +62,23 @@ public class Realm {
 
 
     //getters and setters
+
+    public int get_id() {
+        return _id;
+    }
+
+    public void set_id(int _id) {
+        this._id = _id;
+    }
+
+    public int getFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(int favourite) {
+        this.favourite = favourite;
+    }
+
     public String getRegionID() {
         return regionID;
     }

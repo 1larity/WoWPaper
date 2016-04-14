@@ -17,6 +17,21 @@
         android:singleLine="true"
         android:text="Realm Name"
         android:textSize="14dip"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_alignBottom="@+id/checkBoxRealmFavourite"
+        android:layout_alignTop="@+id/checkBoxRealmFavourite"
+        android:layout_toStartOf="@+id/checkBoxRealmFavourite"
+        android:gravity="center_vertical"
+        android:clickable="true" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkBoxRealmFavourite"
+        android:layout_alignParentTop="false"
+        android:button="@drawable/selector_favourite"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

@@ -3,6 +3,7 @@ package com.digitale.wowpaper;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
 
@@ -16,72 +17,75 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+
 import java.util.ArrayList;
 
 /**
  *
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AsyncResponse {
     /**
      * Debug members
      */
     public static final boolean DEBUG = true;
-    private boolean localDebug=false;
-    private static final String TAG ="MAINACTIVITY" ;
+    private boolean localDebug = true;
+    private static final String TAG = "MAINACTIVITY";
     /**
      * API key required to query blizzard server
      */
-    public static final String API ="5hpb65p224yrhe8bgrsf34hhna2bq6xr" ;
+    public static final String API = "5hpb65p224yrhe8bgrsf34hhna2bq6xr";
     /**
      * UI members
      */
-    public static UI ui=new UI();
+    public static UI ui = new UI();
     private static SectionsPagerAdapter mSectionsPagerAdapter;
     public static String mWoWRegionID;
     public static String mCharacterName;
     public static int mTextColour;
-    public static int mPlatform=Logger.ANDROID;
+    public static int mPlatform = Logger.ANDROID;
     public ViewPager mViewPager;
     public static MainActivity mActivity;
-    public CharactersFragment mCharactersFragment;
-    public RealmListFragment realmListFragment;
+    public static CharactersFragment mCharactersFragment;
+    public static RealmListFragment realmListFragment;
 
     /**
      * Data members
      */
-    public static Database mDatabase=new Database();
-    ArrayList <Realm> mRealmList =new ArrayList<>();
+    public static Database mDatabase = new Database();
+    public static ArrayList<Realm> mRealmList = new ArrayList<>();
     static String mRealmID;
     public static WoWDatabase PrefsDB;
-    //data source team id
-    static int mTeamID=66;
-    //internal database id
-    public static int mTeamIndex;
-    static ArrayList <WoWCharacter> mCharacters =new ArrayList<>();
-     /**
+    public static String[] testSubjects = {"Ameelia", "Amerith", "Mistprowler", "Neara", "Nefratiti", "Elventhongs",
+            "Elvenhunt", "Canielia", "Bagone", "Presbyter", "Elvenhunt", "Grimshanks"};
+    static ArrayList<WoWCharacter> mCharacters = new ArrayList<>();
+
+    /**
      * Logic members
      */
     private Handler mRefreshHandler = new Handler();
     public static RealmAdapter mRealmAdapter;
     public static CharactersAdapter mCharactersAdapter;
     public static GalleryAdapter mGalleryAdapter;
-
+    static Drawable bitmapError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //init database helper
         PrefsDB = new WoWDatabase(this);
-       prefsLoad();
-        launchSplash();
-        //load player portraits
+
+        prefsLoad();
+        if (!DEBUG) {
+            launchSplash();
+        }
+        bitmapError = this.getResources().getDrawable(R.drawable.firstaid);
         mRealmAdapter = new RealmAdapter(this, mRealmList);
         mCharactersAdapter = new CharactersAdapter(this, mCharacters);
-        mGalleryAdapter=new GalleryAdapter(this,mCharacters);
+        mGalleryAdapter = new GalleryAdapter(this, mCharacters);
         mActivity = this;
         ui.onActivityCreateSetTheme(this);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-       // Set up the ViewPager with the sections adapter.
+        // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         if (mViewPager != null) {
             mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageScrolled(final int i, final float v, final int i2) {
             }
+
             @Override
             public void onPageSelected(final int i) {
                 FragmentNotifier fragment = (FragmentNotifier) mSectionsPagerAdapter.instantiateItem(mViewPager, i);
@@ -97,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                     fragment.fragmentVisible();
                 }
             }
+
             @Override
             public void onPageScrollStateChanged(final int i) {
             }
@@ -106,23 +112,25 @@ public class MainActivity extends AppCompatActivity {
         if (mTabLayout != null) {
             mTabLayout.setupWithViewPager(mViewPager);
         }
-        if(DEBUG){
-            Log.i(TAG,"INITIAL DATA LOAD");
+        if (DEBUG) {
+            Log.i(TAG, "INITIAL DATA LOAD");
         }
         refreshData();
 
-      //  initRefreshHandler();
+        //  initRefreshHandler();
     }
+
     //setup and launch splash screen
     private void launchSplash() {
-        Intent intent = new Intent(MainActivity.this,SplashActivity.class);
-        intent.putExtra("SKIN",String.valueOf(ui.getSkinID()));
+        Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+        intent.putExtra("SKIN", String.valueOf(ui.getSkinID()));
         MainActivity.this.startActivity(intent);
     }
-     /**
+
+    /**
      * create handler to refresh data every 10 seconds
      */
-    private void initRefreshHandler(){
+    private void initRefreshHandler() {
         //runnable to periodically update data and invalidate display
         Runnable runnable = new Runnable() {
             public void run() {
@@ -134,49 +142,87 @@ public class MainActivity extends AppCompatActivity {
         };
         mRefreshHandler.postDelayed(runnable, 10000);
     }
+
     /**
      * get data and refresh UI
      */
     private void refreshData() {
-        GetFeedTask realmlistAsyncTask = new GetFeedTask(this,GetFeedTask.REALMLIST);
-       realmlistAsyncTask.execute(GetFeedTask.REALMLIST);
-        GetFeedTask characterListAsyncTask = new GetFeedTask(this,GetFeedTask.CHARACTERLIST);
-        characterListAsyncTask.execute(GetFeedTask.CHARACTERLIST);
+        //check if realmlist has data
+        GetFeedTask realmlistAsyncTask = new GetFeedTask(this, GetFeedTask.SQLREALMLIST);
+        realmlistAsyncTask.delegate = this;
+        realmlistAsyncTask.execute(GetFeedTask.SQLREALMLIST);
+
+        GetFeedTask characterListAsyncTask = new GetFeedTask(this, GetFeedTask.SQLCHARACTERLIST);
+        characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
+    }
+
+    @Override
+    //this override the implemented method from asyncTask
+    public void processFinish(String output) {
+        Logger.writeLog(TAG, "Main Activity got notification feedtask done " + output, localDebug);
+        //Here you will receive the result fired from async class
+        //of onPostExecute(result) method.
+        if (output.equals("EMPTY SQLREALMLIST")) {
+            //no realm data in database probably first run
+            //so lets pull data from web
+            GetFeedTask realmlistAsyncTask = new GetFeedTask(this, GetFeedTask.REALMLIST);
+            //this to set delegate/listener back to this class
+            realmlistAsyncTask.delegate = this;
+            //execute getting the realmlist
+            realmlistAsyncTask.execute(GetFeedTask.REALMLIST);
+        } else if (output.equals("REALMLIST")) {
+            //we had to get realmlist from web so now we need to put it in SQLite
+            GetFeedTask setRealmlistAsyncTask = new GetFeedTask();
+            setRealmlistAsyncTask.delegate = this;
+            //execute setting the realmlist
+            setRealmlistAsyncTask.execute(GetFeedTask.SETREALMLIST);
+        }else if (output.equals("CHARACTER")) {
+            //we have a character, get its images from web
+            GetFeedTask characterImageAsyncTask = new GetFeedTask(this, GetFeedTask.CHARACTERIMAGE);
+            characterImageAsyncTask.currentCharacter=mDatabase.getCharacter();
+            characterImageAsyncTask.execute(GetFeedTask.CHARACTERIMAGE);
+
         }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         PrefsDB.close();
     }
+
     @Override
 
     public void onResume() {
         super.onResume();
-      //  initRefreshHandler();
+        //  initRefreshHandler();
     }
+
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
         mRefreshHandler.removeCallbacksAndMessages(null);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int lSkinID;
         switch (item.getItemId()) {
             case R.id.hordeSkin:
-                lSkinID=UI.THEME_HORDE;
+                lSkinID = UI.THEME_HORDE;
                 break;
             case R.id.allianceSkin:
-                lSkinID=UI.THEME_ALLIANCE;
+                lSkinID = UI.THEME_ALLIANCE;
                 break;
             default:
-                lSkinID=UI.THEME_DEFAULT;
+                lSkinID = UI.THEME_DEFAULT;
         }
         ui.setSkin(item, lSkinID, this);
         prefsSave();
@@ -193,24 +239,27 @@ public class MainActivity extends AppCompatActivity {
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
+
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             Fragment fragment = null;
-            switch(position) {
+            switch (position) {
                 case 0:
-                    fragment= new RealmListFragment();
+                    fragment = new RealmListFragment();
                     break;
                 case 1:
-                    fragment= new CharactersFragment();
+                    fragment = new CharactersFragment();
                     break;
-               }
+            }
             return fragment;
         }
+
         @Override
         public int getCount() {
             return 2;
         }
+
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
@@ -222,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     mCharactersFragment = (CharactersFragment) createdFragment;
                     break;
-                  }
+            }
             return createdFragment;
         }
 
@@ -233,40 +282,43 @@ public class MainActivity extends AppCompatActivity {
                     return "Character\nSearch";
                 case 1:
                     return "Character\nGallery";
-                     }
+            }
             return null;
         }
     }
+
     /**
      * Load Preferences
      */
-    public void prefsLoad( ) {
+    public void prefsLoad() {
         SharedPreferences lPrefs = getPreferences(MODE_PRIVATE);
         int lSkinID = lPrefs.getInt("mSkinID", 0);
-        ui.setSkin(lSkinID,this);
+        ui.setSkin(lSkinID, this);
         //set current regionID from prefs, or default to first region in stock DB
-        mWoWRegionID=lPrefs.getString("mRegionID",MainActivity.PrefsDB.getCurrentRegionURL(0));
+        mWoWRegionID = lPrefs.getString("mRegionID", MainActivity.PrefsDB.getCurrentRegionURL(0));
         //set current realmID from prefs, or default to null
-        mRealmID=lPrefs.getString("mRealmID","");
-        if (DEBUG) Log.d(TAG, "LOADING PREFS SkinID " + lSkinID+
-                            ", Region "+mWoWRegionID+
-                            ", Realm"+mRealmID);
+        mRealmID = lPrefs.getString("mRealmID", "");
+        if (DEBUG) Log.d(TAG, "LOADING PREFS SkinID " + lSkinID +
+                ", Region " + mWoWRegionID +
+                ", Realm" + mRealmID);
     }
+
     /**
      * Save Preferences
      */
-    public  void prefsSave() {
+    public void prefsSave() {
         SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor ed = mPrefs.edit();
         ed.putInt("mSkinID", ui.getSkinID());
-        ed.putString("mRegionID",mWoWRegionID);
-        ed.putString("mRealmID",mRealmID);
+        ed.putString("mRegionID", mWoWRegionID);
+        ed.putString("mRealmID", mRealmID);
         ed.apply();
-         Logger.writeLog(TAG,"SAVING PREFS SkinID " +  ui.getSkinID()+
-                ", Region "+mWoWRegionID+
-                ", Realm"+mRealmID,localDebug);
+        Logger.writeLog(TAG, "SAVING PREFS SkinID " + ui.getSkinID() +
+                ", Region " + mWoWRegionID +
+                ", Realm" + mRealmID, localDebug);
     }
-    public static Context getContext(){
+
+    public static Context getContext() {
         return mActivity.getApplicationContext();
     }
 

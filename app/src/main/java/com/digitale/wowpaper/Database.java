@@ -19,6 +19,7 @@ class Database {
     private static final boolean DEBUG = false;
     public ArrayList<Realm> realms = new ArrayList<>();
     public WoWCharacter character = new WoWCharacter();
+    private boolean localDebug=true;
 
 
     /**
@@ -58,10 +59,13 @@ class Database {
                 Log.i(TAG, "" + jRealms);
             }
             this.realms = new Gson().fromJson(String.valueOf(jRealms), type);
-            //insert realms into database
+            for(Realm currentRealm:this.realms){
+                //set region ID and favorite status of realms
+                //set the region this server is in to maintain realm>region relationship
+                currentRealm.setRegionID(MainActivity.mWoWRegionID);
+                currentRealm.setFavourite(0);
+            }
             Log.d(TAG,"inserting realms into database");
-            //set the region this server is in to maintain realm>region relationship
-       //     long ID = MainActivity.PrefsDB.insertRealms(this.realms);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -82,13 +86,19 @@ class Database {
 
         this.character = new Gson().fromJson(data, type);
         //set the region of this character to maintain character>region relationship
-        this.character.setRegion(MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID));
+        Logger.writeLog(TAG,"writing region ID("+MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID)
+                +") to character "+this.character.getName(),localDebug);
+        this.character.setRegion_id(MainActivity.PrefsDB.getRegionIDFromURL(MainActivity.mWoWRegionID));
+        this.character.setFavourite(0);
         //insert character into database
         long ID = MainActivity.PrefsDB.insertCharacter(this.character);
         result = ID;
         if (DEBUG) {
             Log.i(TAG, "Character" + ID + " " + data);
 
+        }
+        if (result>=0){
+            this.character.set_id(result);
         }
         return result;
     }
@@ -97,20 +107,21 @@ class Database {
      * sets the current character avatar image and store in SQLite PrefsDB
      * @param characterAvatar
      */
-    public void setAvatar(byte[] characterAvatar) {
+    public void setAvatar(byte[] characterAvatar,WoWCharacter currentCharacter) {
         Log.d(TAG,"Commiting avatar data (size)"+characterAvatar.length);
         this.character.setAvatar(characterAvatar);
         //update character avatar image
-        long ID = MainActivity.PrefsDB.updateCharacterAvatar(this.character, characterAvatar);
+        long ID = MainActivity.PrefsDB.updateCharacterAvatar(currentCharacter, characterAvatar);
+
     }
     /**
      * sets the current character profile image and store in SQLite PrefsDB
      * @param characterProfile
      */
-    public void setProfileImage(byte[] characterProfile) {
-        Log.d(TAG,"Commiting profile data (size)"+characterProfile.length);
+    public void setProfileImage(byte[] characterProfile,WoWCharacter currentCharacter) {
+        Logger.writeLog(TAG,"Commiting profile data (size)"+characterProfile.length,localDebug);
         this.character.setProfilemain(characterProfile);
         //update character avatar image
-        long ID = MainActivity.PrefsDB.updateCharacterProfilemain(this.character, characterProfile);
+        long ID = MainActivity.PrefsDB.updateCharacterProfilemain(currentCharacter, characterProfile);
     }
 }

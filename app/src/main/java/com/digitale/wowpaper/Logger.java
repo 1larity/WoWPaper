@@ -25,4 +25,19 @@ public class Logger {
             }
         }
     }
+    public static void error(String TAG, String message) {
+
+            switch (MainActivity.mPlatform) {
+                case ANDROID:
+                    Log.e(TAG, message);
+                    break;
+                case JAVA:
+                    System.out.println(TAG + " ERROR " + message);
+                    break;
+                case FILE:
+                    //TODO filewriter
+                    break;
+            }
+
+    }
 }

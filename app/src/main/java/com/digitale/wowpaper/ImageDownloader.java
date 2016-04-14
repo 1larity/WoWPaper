@@ -16,6 +16,7 @@ import java.net.URLConnection;
  */
 public class ImageDownloader  {
     private static final String TAG ="IMAGEDOWNLOADER" ;
+    private boolean localDebug=false;
 
     public byte[] getLogoImage(String url) {
         byte[] photo = new byte[0];
@@ -31,9 +32,9 @@ public class ImageDownloader  {
 
             }
             photo = baf.toByteArray();
-            Log.d(TAG,"photo length" + photo);
+            Logger.writeLog(TAG,"photo length" + photo,localDebug);
         } catch (Exception e) {
-            Log.e(TAG, "Error: " + e.toString());
+            Logger.error(TAG, "Error: " + e.toString());
         }
         return photo;
     }
