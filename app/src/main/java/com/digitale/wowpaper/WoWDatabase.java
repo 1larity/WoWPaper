@@ -307,7 +307,7 @@ public class WoWDatabase extends SQLiteAssetHelper {
         mWriteLock=true;
     }
 
-    //adds character record to database
+    //Update character record to new avatar
         public long updateCharacterAvatar(WoWCharacter character, byte[] avatar) {
             writeLock();
             SQLiteDatabase wdb=getWritableDatabase();
@@ -334,14 +334,15 @@ public class WoWDatabase extends SQLiteAssetHelper {
             mWriteLock=false;
             return newRowId;
         }
-    //adds character record to database
+
+    //Update character record to new profile image
     public long updateCharacterProfilemain(WoWCharacter character, byte[] profilemain) {
         writeLock();
         SQLiteDatabase wdb=getWritableDatabase();
         ContentValues characterValues = new ContentValues();
         characterValues.put(WoWCharacter.CharacterRecord.COLUMN_NAME_PROFILE, profilemain);
 
-        // Insert the new row, returning the primary key value of the new row
+        // Update the row, returning the primary key value of the new row
         long newRowId = 0;
         try  {
             Log.d(TAG,"Character Exists, Updating Profilemain");
@@ -365,6 +366,33 @@ public class WoWDatabase extends SQLiteAssetHelper {
         }
         wdb.close();
         Log.d(TAG,"Profile update complete RowID="+newRowId);
+        mWriteLock=false;
+        return newRowId;
+    }
+    //Update realm record to new favourite status
+    public long updateRealmFavourite(Realm realm) {
+        writeLock();
+        SQLiteDatabase wdb=getWritableDatabase();
+        ContentValues realmValues = new ContentValues();
+        realmValues.put(Realm.RealmRecord.COLUMN_NAME_FAVOURITE, realm.getFavourite());
+
+        // Update the row, returning the primary key value of the new row
+        long newRowId = 0;
+        try  {
+            Log.d(TAG,"Realm Exists, updating favourite");
+            String sqlString= Realm.RealmRecord.COLUMN_NAME_ID+"=?";
+            Log.d(TAG,"where "+sqlString);
+            Logger.writeLog(TAG,"Realm ID"+realm.get_id(),localDebug);
+            //conflict exists, update row where realm ID match
+            newRowId =  wdb.update( Realm.RealmRecord.TABLE_NAME, realmValues,
+                    Realm.RealmRecord.COLUMN_NAME_ID+"=?",
+                    new String[] {String.valueOf(realm.get_id())});
+
+        } catch (SQLiteConstraintException e) {
+            newRowId = -1;
+        }
+        wdb.close();
+        Log.d(TAG,"Realm update complete RowID="+newRowId);
         mWriteLock=false;
         return newRowId;
     }

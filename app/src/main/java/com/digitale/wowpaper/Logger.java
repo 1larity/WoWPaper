@@ -11,7 +11,7 @@ public class Logger {
     public static final int FILE = 3;
 
     public static void writeLog(String TAG, String message, boolean localDebug) {
-        if (MainActivity.DEBUG && localDebug) {
+        if (1==2){ //MainActivity.DEBUG==true && localDebug==true) {
             switch (MainActivity.mPlatform) {
                 case ANDROID:
                     Log.d(TAG, message);

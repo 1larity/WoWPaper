@@ -29,6 +29,9 @@ public class Realm {
     public Realm() {
 //abstract class for referencing SQLite columns/table
     }
+
+
+
     public static abstract class RealmRecord implements BaseColumns {
         public static final String TABLE_NAME = "realm_status";
         public static final String COLUMN_NAME_ID = "_id";

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WoW Desktop Background</string>
+    <string name="app_name">WoW-Paper</string>
     <string name="commentaryEvent">Event</string>
     <string name="commentaryHeading">Heading</string>
     <string name="commentaryDescription">Description</string>
@@ -29,7 +29,7 @@
     <string name="goalLabel">Goals</string>
     <string name="winLabel">Points</string>
     <string name="region_spinner_instructions">Pick WoW region.</string>
-    <string name="server_list_instructions">Pick server.</string>
+    <string name="server_list_instructions">Long press to pick server.</string>
     <string name="buttonSearchText">Find</string>
     <string name="wallpaper_description">WoW Wallpaper</string>
 </resources>

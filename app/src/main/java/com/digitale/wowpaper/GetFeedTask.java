@@ -42,11 +42,13 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
     public static final int DELETERECORD = 8;
     public static final int SETREALMLIST = 9;
     private static final String TAG = "GETFEEDTASK ";
+    public static final int FAVOURITEREALM = 10;
     private boolean localDebug = true;
     public MainActivity activity;
     public WoWWallpaperService wallPaperService;
     private int mode;
     public WoWCharacter currentCharacter = new WoWCharacter();
+    public Realm currentRealm=new Realm();
     private long id;
     private ProgressDialog progressDialog;
     public AsyncResponse delegate = null;
@@ -133,6 +135,10 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
             case DELETERECORD:
                 Logger.writeLog(TAG, "ABOUT TO DELETE A CHARACTER " + id, localDebug);
                 MainActivity.PrefsDB.deleteRecord(id, WoWCharacter.CharacterRecord.TABLE_NAME);
+                break;
+            case FAVOURITEREALM:
+                Logger.writeLog(TAG, "ABOUT TO UPDATE A REALM " + currentRealm.get_id(), localDebug);
+                MainActivity.PrefsDB.updateRealmFavourite(currentRealm);
                 break;
             case CHARACTER:
                 getURL = MainActivity.PrefsDB.getRegionURLfromID(currentCharacter.getRegion_id()) +
@@ -388,6 +394,9 @@ class GetFeedTask extends AsyncTask<Integer, Void, TaskResult> {
         } else if (result.getMode() == DELETERECORD) {
             delegate.processFinish(DELETERECORD, result.data);
             Logger.writeLog(TAG, "Deleted Record", localDebug);
+        } else if (result.getMode() == FAVOURITEREALM ) {
+            delegate.processFinish(FAVOURITEREALM, result.data);
+            Logger.writeLog(TAG, "Favorited realm record", localDebug);
         }
     }
 }

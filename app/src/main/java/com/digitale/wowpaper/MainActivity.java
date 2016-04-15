@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  *
@@ -28,8 +30,8 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
     /**
      * Debug members
      */
-    public static final boolean DEBUG = true;
-    private boolean localDebug = true;
+    public static final boolean DEBUG = false;
+    private boolean localDebug = false;
     private static final String TAG = "MAINACTIVITY";
     /**
      * API key required to query blizzard server
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
         PrefsDB = new WoWDatabase(this);
 
         prefsLoad();
-        if (!DEBUG) {
+        if (true) {
             launchSplash();
         }
         mRealmAdapter = new RealmAdapter(this, mRealmList);
@@ -163,7 +165,11 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
         //receive the result fired from async class
         //of onPostExecute(result) method.
         if (output==GetFeedTask.SQLREALMLIST) {
-            if(mRealmList.size()<=0) {
+            mRealmList.clear();
+            mRealmList.addAll((Collection<? extends Realm>) data);
+            sortRealmlist();
+            if(mRealmList.isEmpty()) {
+                Logger.writeLog(TAG,"Realm query was empty, scanning web.",localDebug);
                 //no realm data in database probably first run
                 //so lets pull data from web
                 GetFeedTask realmlistAsyncTask = new GetFeedTask(this, GetFeedTask.REALMLIST);
@@ -180,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
             //got realmlist data, update UI
             mRealmList.clear();
             mRealmList.addAll((Collection<? extends Realm>) data);
+          sortRealmlist();
             mRealmAdapter.notifyDataSetChanged();
             mRealmID = mRealmList.get(0).getName();
             realmListFragment.setServerTextDisplay();
@@ -217,9 +224,28 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
             characterListAsyncTask.delegate = this;
             characterListAsyncTask.execute(GetFeedTask.SQLCHARACTERLIST);
 
+        }else if (output==GetFeedTask.FAVOURITEREALM) {
+            //change to realmlist re-sort data and refreshUI
+            sortRealmlist();
+            MainActivity.mRealmAdapter.notifyDataSetChanged();
+
         }
     }
-
+public void sortRealmlist(){
+    Collections.sort(mRealmList, new Comparator<Realm>() {
+        @Override
+        public int compare(Realm lhs, Realm rhs) {
+            //have to reverse value of flag for correct sorting
+            int lhsFav=1-lhs.getFavourite();
+            int rhsFav=1-rhs.getFavourite();
+            String lhsCompositeString=lhsFav+lhs.getName();
+            String rhsCompositeString=rhsFav+rhs.getName();
+            Logger.writeLog(TAG,"COMPARE LHS="+lhsCompositeString+" RHS "+rhsCompositeString+
+                    " result"+lhsCompositeString.compareTo(rhsCompositeString),localDebug);
+            return lhsCompositeString.compareTo(rhsCompositeString);
+        }
+    });
+}
     @Override
     public void onDestroy() {
         super.onDestroy();
